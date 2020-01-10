@@ -17,8 +17,8 @@ class Login {
             //connect to the database, then authenticate
             connector.connect().then((connection) => {
                 return new Promise(function(resolve, reject) {
-                    if(global.DEBUG_FLAG) {
-                        console.log(`DEBUG: Promise accepted, now running query`);
+                    if(global.DEBUG_FLAG && global.DEBUG_LEVEL == 1) {
+                        console.log(`DEBUG LEVEL 1: Login Promise accepted, now authenticating`);
                     }
                     
                     //create a new Request for our SQL Query
@@ -56,16 +56,16 @@ class Login {
                     //and resolve wrapper promise
                     connection.close();
                     
-                    if(global.DEBUG_FLAG) {
-                        console.log("DEBUG: Database Connection Closed");
+                    if(global.DEBUG_FLAG && global.DEBUG_LEVEL == 1) {
+                        console.log("DEBUG LEVEL 1: Database Connection Closed");
                     }
                     funResolve(res);
                 }).catch((error) => {
                     //if out authentication has been rejected, then close and show error
                     //and reject wrapper promise
                     connection.close();
-                    if(global.DEBUG_FLAG) {
-                        console.log("DEBUG: Database Connection Closed");
+                    if(global.DEBUG_FLAG && global.DEBUG_LEVEL == 1) {
+                        console.log("DEBUG LEVEL 1: Database Connection Closed");
                     }
                     funReject(error);
                 });

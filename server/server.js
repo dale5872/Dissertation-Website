@@ -6,8 +6,25 @@ const Promise = require('promise');
 var app = express();
 
 const Login = require('./auth/login.js');
+const RegistrationProfile = require('./auth/registrationProfile.js');
+const Registration = require('./auth/registration.js');
 
 global.DEBUG_FLAG = true;
+global.DEBUG_LEVEL = 1; //1 = EVERYTHING, 2 = MAIN OPERATIONS
+
+if(global.DEBUG_LEVEL) {
+    switch(global.DEBUG_LEVEL) {
+        case 1:
+            console.log(`DEBUG LEVEL 1 ENABLED. EVERYTHING WILL BE LOGGED.
+            THIS IS FOR DEVELOPMENT PURPOSES ONLY`);
+            break;
+        case 2:
+            console.log(`DEBUG LEVEL 2 ENABLED. ALL MAJOR OPERATIONS (INCLUDING TRANSMITTED INFORMATION)
+            WILL BE LOGGED.
+            THIS IS FOR DEVELOPMENT PURPOSES ONLY`);
+            break;
+    }
+}
 
 //-----------------------------------------------
 //----------------- Express Config --------------
@@ -61,5 +78,27 @@ app.route('/api/auth/login').post(function(req, res) {
     });
 });
 
+app.route('/api/auth/register').post(function(req, res) {
+    var username = req.body.username;
+    var password = req.body.password;
+    var email = req.body.email;
+    var fname = req.body.fname;
+    var lname = req.body.lname;
+    var lecturer = req.body.lecturer;
+
+    if(global.DEBUG_FLAG) {
+        console.log(`Recieved Registration Request from ${fname} ${lname}`);
+    }
+
+    var profile = new RegistrationProfile(username, password, fname, lname, email, lecturer);
+
+    var reg = new Registration(profile);
+    if(reg.register()) {
+        res.send("User has been registered");
+    } else {
+        res.send("User has failed to register");
+    }
+
+});
 
 app.listen(3000);

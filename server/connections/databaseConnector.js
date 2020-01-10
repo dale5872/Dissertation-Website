@@ -25,8 +25,8 @@ class Connector {
             
             var connection = new Connection(config);
 
-            if(global.DEBUG_FLAG) {
-                console.log("DEBUG: Created Connection Config");
+            if(global.DEBUG_FLAG && global.DEBUG_LEVEL == 1) {
+                console.log("DEBUG LEVEL 1: Created Connection Config");
             }
 
             connection.on("connect", function(err) {
@@ -35,8 +35,8 @@ class Connector {
                     console.error(err.message);
                     reject("Failed to connect to Database");
                 } else {
-                    if(global.DEBUG_FLAG) {
-                        console.log("DEBUG: Connected to Database");
+                    if(global.DEBUG_FLAG && global.DEBUG_LEVEL == 1) {
+                        console.log("DEBUG LEVEL 1: Connected to Database");
                     }
                     resolve(connection);        
                 }               
