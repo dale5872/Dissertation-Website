@@ -14,7 +14,7 @@ class RegistrationProfile {
     }
 
     get userID() {
-        return this.userID;
+        return this._userID;
     }
 
     set username(username) {

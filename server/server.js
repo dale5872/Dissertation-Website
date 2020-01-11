@@ -94,9 +94,9 @@ app.route('/api/auth/register').post(function(req, res) {
 
     var reg = new Registration(profile);
     if(reg.register()) {
-        res.send("User has been registered");
+        res.send("User registered successfully");
     } else {
-        res.send("User has failed to register");
+        res.send("User failed registration");
     }
 
 });

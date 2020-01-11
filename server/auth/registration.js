@@ -6,34 +6,40 @@ class Registration {
         this.profile = profile;
     }
 
-    register() {
-        this.createAccount().then(() => {
-             this.insertUserInformation()
-             .catch(() => { 
-                 //THIS IS BEING CAUGHT NO MATTER WHAT HAPPENS IN createAccount()
-                 console.error("ERROR: Failed to register user. User information was not added"); 
-                 return false; 
-            });
-        })
-        .catch(() => { 
-            console.error("ERROR: Failed to Create User Account"); 
-            return false; 
-        });
+    async register() {
+        try {
+            var connector = new Connector();
 
-        return true;
+            let connection = await connector.connect().catch((message) => {
+                return false;
+            });
+
+            await this.createAccount(connection).catch((message) => {
+                return false;
+            });
+
+            connection.close();
+            return true;
+        } catch(err) {
+            console.log(`ERROR: ${err.message}`);
+        }
     }
 
-    async createAccount() {
-        var connector = new Connector();
-            
-        connector.connect().then((connection) => {
+    /**
+     * TODO: TURN THIS INTO A TRANSACTION IN CASE OF FAILED ATTEMPTS
+     * Function creates a new account, and imports the user information given
+     * throught the HTTP POST call. If any stage of the registration fails, then 
+     * the database will rollback and no changes will be commited.
+     * @param {Connection} connection - Tedious Connection Object to the Database
+     */
+    async createAccount(connection) {
+        return new Promise((resolve, reject) => {
             if(global.DEBUG_FLAG && global.DEBUG_LEVEL == 1) {
                 console.log(`DEBUG LEVEL 1: Registration Promise accepted, now registering`);
             }
-
+    
             var accType = this.profile.lecturer ? "Lecturer" : "Student";
-            var userID;
-
+    
             //lets create a new request
             var request1 = new Request(
                 `INSERT INTO feedbackhub.user_accounts VALUES ('${this.profile.username}', '${this.profile.password}', '${accType}'); 
@@ -43,61 +49,48 @@ class Registration {
                         console.error("ERROR: An SQL Error Has Occured");
                         console.error(err.message);
                         console.error(`ERROR: Location registration.js, INSERT INTO user_accounts...`);
-                        throw("An error has occured");
+                        reject();
                     } else {
                         if(global.DEBUG_FLAG && global.DEBUG_LEVEL == 1) {
                             console.log(`DEBUG LEVEL 1: User Account has been created -> ${this.profile.username}`);
+                            console.log(`DEBUG LEVEL 1: Inserting User Information`);
                         }
+            
+                        //lets create a new request
+                        var request2 = new Request(
+                            `INSERT INTO feedbackhub.user_information VALUES ('${parseInt(this.profile.userID)}', '${this.profile.fname}', '${this.profile.lname}', '${this.profile.email}')`,
+                            (err) => {
+                                if(err) {
+                                    console.error("ERROR: An SQL Error Has Occured");
+                                    console.error(err.message);
+                                    console.error(`ERROR: Location registration.js, INSERT INTO user_information...`);
+                                    reject();
+                                } else {
+                                    if(global.DEBUG_FLAG && global.DEBUG_LEVEL == 1) {
+                                        console.log(`DEBUG LEVEL 1: User Information has been inserted ${this.profile.username} -> ${this.profile.userID}`);
+                                    }
+                                    //everything has succeeded, now we can fulfull the promise
+                                    resolve();
+                                }
+                            }
+                        );
+                            
+                        connection.execSql(request2);
                     }
                 }
-            );
-
-            //Fetch the userID from the above query
-            request1.on('row', (columns) => {
-                this.userID = columns[0].value;
-
-                if(global.DEBUG_FLAG && global.DEBUG_LEVEL == 1) {
-                    console.log(`DEBUG LEVEL 1: USER ID has been generated for ${this.profile.username} -> ${this.userID}`);
-                }
+                );
+                
+                //Fetch the userID from the above query
+                request1.on('row', (columns) => {
+                    this.profile.userID = columns[0].value;
+                    
+                    if(global.DEBUG_FLAG && global.DEBUG_LEVEL == 1) {
+                        console.log(`DEBUG LEVEL 1: USER ID has been generated for ${this.profile.username} -> ${this.userID}`);
+                    }
             });
-
+    
             connection.execSql(request1);
         });
-
-        return true;
     }
-
-    async insertUserInformation() {
-        var obj = this; //we need to preserve the current objects reference
-
-        connector.connect().then((connection) => {
-
-            //lets create a new request
-            var request2 = new Request(
-                `INSERT INTO feedbackhub.user_information VALUES ('${this.profile.userID}', '${this.profile.fname}', '${this.profile.lname}', '${this.profile.email}')`,
-                (err) => {
-                    if(err) {
-                        console.error("ERROR: An SQL Error Has Occured");
-                        console.error(err.message);
-                        console.error(`ERROR: Location registration.js, INSERT INTO user_information...`);
-                        throw("An error has occured");
-                    } else {
-                        if(global.DEBUG_FLAG && global.DEBUG_LEVEL == 1) {
-                            console.log(`DEBUG LEVEL 1: User Information has been inserted ${this.profile.username} -> ${userID}`);
-                        }
-                        //everything has succeeded, now we can fulfull the promise
-                        resolve("User has been registered!");
-                        connection.close();
-                    }
-                }
-            );
-
-            connection.execSql(request2);
-        });
-
-        return true;
-    }
-
 }
-
 module.exports = Registration;
