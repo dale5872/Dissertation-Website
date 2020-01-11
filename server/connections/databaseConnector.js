@@ -38,7 +38,6 @@ class Connector {
                     if(global.DEBUG_FLAG && global.DEBUG_LEVEL == 1) {
                         console.log("DEBUG LEVEL 1: Connected to Database");
                     }
-                    console.log("RETURNING");
                     resolve(connection);
                 }               
             });  

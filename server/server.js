@@ -93,11 +93,9 @@ app.route('/api/auth/register').post(function(req, res) {
     var profile = new RegistrationProfile(username, password, fname, lname, email, lecturer);
 
     var reg = new Registration(profile);
-    if(reg.register()) {
-        res.send("User registered successfully");
-    } else {
-        res.send("User failed registration");
-    }
+    reg.register().then((message) => {
+        res.send(message);
+    });
 
 });
 
