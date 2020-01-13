@@ -1,6 +1,15 @@
-class RegistrationProfile {
-    constructor(username, password, fname, lname, email, lecturer) {
+class UserProfile {
+    constructor() {
         this._userID;
+        this._username;
+        this._password;
+        this._fname;
+        this._lname;
+        this._email;
+        this._lecturer;
+    }
+
+    registerProfile(username, password, fname, lname, email, lecturer) {
         this._username = username;
         this._password = password;
         this._fname = fname;
@@ -8,6 +17,12 @@ class RegistrationProfile {
         this._email = email;
         this._lecturer = lecturer;
     }
+
+    loginProfile(username, password) {
+        this._username = username;
+        this._password = password;
+    }
+
 
     set userID(userID) {
         this._userID = userID;
@@ -66,4 +81,4 @@ class RegistrationProfile {
     }
 }
 
-module.exports = RegistrationProfile;
+module.exports = UserProfile;

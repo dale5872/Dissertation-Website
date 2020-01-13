@@ -18,7 +18,6 @@ class Registration {
 
             if(connection !== undefined) {
                 outputMessage = await this.createAccountTransaction(connection).catch((error) => {
-                    console.log(`ERROR::: ${error}`);
                     errorMessage = error;
                 });
 
