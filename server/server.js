@@ -2,12 +2,19 @@ const express = require('express');
 const session = require('express-session');
 const bodyParser = require('body-parser');
 const Promise = require('promise');
+const tediousStore = require('connect-tedious')(session);
 
-var app = express();
+const app = express();
 
 const Login = require('./auth/login.js');
-const RegistrationProfile = require('./auth/registrationProfile.js');
+const UserProfile = require('./auth/userProfile.js');
 const Registration = require('./auth/registration.js');
+const Connector = require('./connections/databaseConnector.js');
+
+const connector = new Connector();
+const connectorConfig = connector.getConfig();
+
+console.log(connectorConfig);
 
 global.DEBUG_FLAG = true;
 global.DEBUG_LEVEL = 1; //1 = EVERYTHING, 2 = MAIN OPERATIONS
@@ -29,13 +36,26 @@ if(global.DEBUG_LEVEL) {
 //-----------------------------------------------
 //----------------- Express Config --------------
 //-----------------------------------------------
-
-app.use(session({
-    secret: 'secret',
-    resave: true,
-    saveUninitialized: true
+app.use(session({ 
+    secret: 'alskdjghfjlr92345n34£C£(Tegwegcnuerlty3p4t8cnREG[eqEQ{P|[;q9ocruwW|";QW[0ciq0[ewqw[cQW{PRCr',
+    store: new tediousStore({
+        config: {
+            userName: 'dale',
+            password: 'EdenHazard10',
+            server: 'feedback-hub.database.windows.net',
+            options: {
+                database: "FeedbackHub",
+                encrypt: true
+            }
+        }
+    }),
+    saveUnitialized: false,
+    resave: false
 }));
-
+app.use(express.json());
+app.use(express.urlencoded({
+    extended: false
+}));
 app.use(bodyParser.urlencoded({extended : true}));
 app.use(bodyParser.json());
 
@@ -60,22 +80,38 @@ app.route('/api').post(function(req, res) {
 });
 
 app.route('/api/auth/login').post(function(req, res) {
+    if(req.session.userID) {
+        if(global.DEBUG_FLAG && global.DEBUG_LEVEL == 1) {
+            console.log(`User ${req.session.userID} is already logged in`);
+        }
+        return res.sendStatus(401).send("Already Authenticated");
+    }
     var username = req.body.username;
     var password = req.body.password;
+    
+    var profile = new UserProfile();
+    profile.loginProfile(username, password);
 
     if(global.DEBUG_FLAG) {
         console.log(`Recieved POST Request with headers username=${username}:password=${password}`);
     }
 
     //using promises (i.e., syncronous execution, we authenticate the user)
-    var l = new Login(username, password);
-    l.authenticate().then((response) => {
-        console.log(`OUTPUT: ${response}`);
-        res.send(response);
-    }).catch((error) => {
-        console.log(`OUTPUT: ${error}`);
-        res.send(error);
-    });
+    var login = new Login(profile);
+    try {
+        login.authenticate().then((message) => {
+            const userID = profile.userID;
+    
+            if(global.DEBUG_FLAG && global.DEBUG_LEVEL == 1) {
+                console.log(`DEBUG LEVEL 1: User with ID: ${userID} has been fetched`);
+            }
+
+            req.session.userID = userID;
+            res.sendStatus(200).send("User Authenticated");
+        });
+    } catch (err) {
+        res.sendStatus(401).send(err);
+    }    
 });
 
 app.route('/api/auth/register').post(function(req, res) {
@@ -90,7 +126,8 @@ app.route('/api/auth/register').post(function(req, res) {
         console.log(`Recieved Registration Request from ${fname} ${lname}`);
     }
 
-    var profile = new RegistrationProfile(username, password, fname, lname, email, lecturer);
+    var profile = new UserProfile();
+    profile.registerProfile(username, password, fname, lname, email, lecturer);
 
     var reg = new Registration(profile);
     reg.register().then((message) => {
