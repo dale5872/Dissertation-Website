@@ -7,30 +7,31 @@ class Registration {
     }
 
     async register() {
-        try {
-            var outputMessage;
-            var errorMessage;
-            var connector = new Connector();
+        var connector = new Connector();
+        var error = false; 
+        //if throwing error in the catch block, NodeJS Complains
+        //could possibly be solved in a try / catch block
 
-            let connection = await connector.connect().catch((error) => {
-                outputMessage = error;
-            });
+        let connection = await connector.connect().catch((error) => {
+            error = true;
+        });
 
-            if(connection !== undefined) {
-                outputMessage = await this.createAccountTransaction(connection).catch((error) => {
-                    errorMessage = error;
-                });
-
-                if(global.DEBUG_FLAG && global.DEBUG_LEVEL == 1) {
-                    console.log(`DEBUG LEVEL 1: Closing Database Connection`);
-                }
-                connection.close();
-            }
-
-            return errorMessage === undefined ? outputMessage : errorMessage;
-        } catch(err) {
-            console.log(`ERROR: ${err.message}`);
+        if(error) {
+            throw new Error("Failed to connect to database");
         }
+
+        outputMessage = await this.createAccountTransaction(connection).catch((error) => {
+            error = true;
+        });
+
+        if(error) {
+            throw new Error("Failed to register the user");
+        }
+
+        if(global.DEBUG_FLAG && global.DEBUG_LEVEL == 1) {
+            console.log(`DEBUG LEVEL 1: Closing Database Connection`);
+        }
+        connection.close();
     }
 
     /**

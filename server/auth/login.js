@@ -8,20 +8,31 @@ class Login {
 
     async authenticate() {
         var connector = new Connector();
-        var outputMessage;
+        var error = false;
+        //if throwing error in the catch block, NodeJS Complains
+        //could possibly be solved in a try / catch block
 
-        let connection = await connector.connect().catch((error) => {
-            throw new Error(`Failed to connect to the database. ${error}`);
+        let connection = await connector.connect().catch((e) => {
+            error = true;
         });
 
-        outputMessage = await this.authenticateUser(connection).catch((error) => {
-            throw new Error(error);
+        if(error) {
+            throw new Error("SQL ERROR");
+        }
+
+        let outputMessage = await this.authenticateUser(connection).catch((e) => {
+            error = true;
         });
+
+        if(error) {
+            throw new Error("Authentication Failed");
+        }
 
         if(global.DEBUG_FLAG && global.DEBUG_LEVEL == 1) {
             console.log(`DEBUG LEVEL 1: Closing Database Connection`);
         }
         connection.close();
+        return outputMessage;
     }
 
     async authenticateUser(connection) {

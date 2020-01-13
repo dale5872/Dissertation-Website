@@ -84,7 +84,7 @@ app.route('/api/auth/login').post(function(req, res) {
         if(global.DEBUG_FLAG && global.DEBUG_LEVEL == 1) {
             console.log(`User ${req.session.userID} is already logged in`);
         }
-        return res.sendStatus(401).send("Already Authenticated");
+        return res.status(401).send("Already Authenticated");
     }
     var username = req.body.username;
     var password = req.body.password;
@@ -98,20 +98,18 @@ app.route('/api/auth/login').post(function(req, res) {
 
     //using promises (i.e., syncronous execution, we authenticate the user)
     var login = new Login(profile);
-    try {
-        login.authenticate().then((message) => {
-            const userID = profile.userID;
-    
-            if(global.DEBUG_FLAG && global.DEBUG_LEVEL == 1) {
-                console.log(`DEBUG LEVEL 1: User with ID: ${userID} has been fetched`);
-            }
+    login.authenticate().then((message) => {
+        const userID = profile.userID;
 
-            req.session.userID = userID;
-            res.sendStatus(200).send("User Authenticated");
-        });
-    } catch (err) {
-        res.sendStatus(401).send(err);
-    }    
+        if(global.DEBUG_FLAG && global.DEBUG_LEVEL == 1) {
+            console.log(`DEBUG LEVEL 1: User with ID: ${userID} has been fetched`);
+        }
+
+        req.session.userID = userID;
+        res.status(200).send("User Authenticated");
+    }).catch((error) => {
+        res.status(401).send(error.message);
+    });
 });
 
 app.route('/api/auth/register').post(function(req, res) {
