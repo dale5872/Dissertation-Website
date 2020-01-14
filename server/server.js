@@ -75,10 +75,6 @@ app.get('/',function(req,res) {
 //-----------------------------------------------
 //----------------- API ROUTES ------------------
 //-----------------------------------------------
-app.route('/api').post(function(req, res) {
-    //EXAMPLE API POSR ROUTE
-});
-
 app.route('/api/auth/login').post(function(req, res) {
     if(req.session.userID) {
         if(global.DEBUG_FLAG && global.DEBUG_LEVEL == 1) {
@@ -89,24 +85,30 @@ app.route('/api/auth/login').post(function(req, res) {
     var username = req.body.username;
     var password = req.body.password;
     
-    var profile = new UserProfile();
-    profile.loginProfile(username, password);
+    var userProfile = new UserProfile();
+    userProfile.loginProfile(username, password);
 
     if(global.DEBUG_FLAG) {
         console.log(`Recieved POST Request with headers username=${username}:password=${password}`);
     }
 
     //using promises (i.e., syncronous execution, we authenticate the user)
-    var login = new Login(profile);
-    login.authenticate().then((message) => {
-        const userID = profile.userID;
+    var login = new Login(userProfile);
+    login.authenticate().then(() => {
+        const sessionID = req.sessionID;
+
+        //we now need to add the sessionID to the JSON Object we generate
+        var jsonProfile = userProfile.generateProfile();
+        jsonProfile.sessionID = sessionID;
 
         if(global.DEBUG_FLAG && global.DEBUG_LEVEL == 1) {
-            console.log(`DEBUG LEVEL 1: User with ID: ${userID} has been fetched`);
+            console.log(`DEBUG LEVEL 1: User with ID: ${userProfile.userID} has been fetched`);
         }
 
-        req.session.userID = userID;
-        res.status(200).send("User Authenticated");
+        //CURRENTLY THE PASSWORD IS STILL STORED IN THE PROFILE
+        //THIS MUST BE REMOVED
+        req.session.userID = userProfile.userID;
+        res.status(200).send(JSON.stringify(jsonProfile));
     }).catch((error) => {
         res.status(401).send(error.message);
     });

@@ -79,6 +79,17 @@ class UserProfile {
     get lecturer() {
         return this._lecturer;
     }
+ 
+    generateProfile() {
+        return {
+            userID: this._userID,
+            username: this._username,
+            fname: this._fname,
+            lname: this._lname,
+            email: this._email,
+            lecturer: this._lecturer
+        }
+    }
 }
 
 module.exports = UserProfile;
