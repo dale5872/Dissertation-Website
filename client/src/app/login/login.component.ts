@@ -26,6 +26,7 @@ export class LoginComponent implements OnInit {
   }
 
   ngOnInit() {
+    //check if user is already logged in, if so redirect to the dashboard
     if(this.session.isLoggedIn()) {
       this.router.navigateByUrl('/dashboard');
     }
@@ -64,12 +65,10 @@ export class LoginComponent implements OnInit {
     const loginRequest = Object.assign({}, this.loginForm.value);
     const loginProfile: LoginModel = Object.assign({}, loginRequest.loginControls);
 
-    console.log(loginProfile.username);
 
     this.authService.login(loginProfile.username, loginProfile.password).subscribe(
       (profile: User) => {
         if(profile.sessionID) {
-          console.log(profile);
           localStorage.setItem("JWT", profile.sessionID);
           
           //redirect to dashboard
