@@ -4,6 +4,7 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 import { User } from '../_models/user';
+import { RegistrationModel } from '../_models/registration';
 
 @Injectable({
   providedIn: 'root'
@@ -16,6 +17,16 @@ export class AuthenticationService {
     return this.http.post<User>('http://51.11.10.177:3000/api/auth/login', {
       username: username,
       password: password
+    });
+  }
+
+  register(profile: RegistrationModel) {
+    return this.http.post('http://51.11.10.177:3000/api/auth/login', {
+      username: profile.username,
+      password: profile.password,
+      email: profile.email,
+      fname: profile.firstName,
+      lname: profile.lastName
     });
   }
 }

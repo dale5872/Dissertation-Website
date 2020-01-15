@@ -31,12 +31,19 @@ export class LoginComponent implements OnInit {
     }
   }
 
+  /**
+   * Creates the data bindings to the form using the LoginModel
+   * class
+   */
   createForm() {
     return this.formBuilder.group({
       loginControls: this.formBuilder.group(new LoginModel())
     });
   }
 
+  /**
+   * Clears the form and re-creates the data bindings
+   */
   clearForm() {
     this.loginForm.reset();
     this.loginForm.reset({
@@ -45,6 +52,12 @@ export class LoginComponent implements OnInit {
 
   }
 
+  /**
+   * Sends a request through the authentication service
+   * to authenticate the user with the given credentials.
+   * If successful, redirects to dashboard
+   * If unsuccessful, displays alert (THIS WILL BE CHANGED IN FUTURE)
+   */
   login() {
     //create a copy of the form data (and all subsequent groups) as any
     //changes could affect the form
