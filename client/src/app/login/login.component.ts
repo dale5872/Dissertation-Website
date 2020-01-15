@@ -6,7 +6,7 @@ import { FormControl, FormGroup, FormBuilder } from '@angular/forms';
 
 import { User } from '../_models/user';
 import { LoginModel } from '../_models/login';
-import { removeSummaryDuplicates } from '@angular/compiler';
+import { removeSummaryDuplicates, ParseSourceFile } from '@angular/compiler';
 
 @Component({
   selector: 'app-login',
@@ -26,20 +26,15 @@ export class LoginComponent implements OnInit {
   }
 
   ngOnInit() {
+    if(this.session.isLoggedIn()) {
+      this.router.navigateByUrl('/dashboard');
+    }
   }
 
   createForm() {
     return this.formBuilder.group({
       loginControls: this.formBuilder.group(new LoginModel())
     });
-    /**
-    return new FormGroup({
-      loginControls: new FormGroup({
-        username: new FormControl(),
-        password: new FormControl()
-      })
-    });
-    */
   }
 
   clearForm() {
@@ -60,8 +55,15 @@ export class LoginComponent implements OnInit {
 
     this.authService.login(loginProfile.username, loginProfile.password).subscribe(
       (profile: User) => {
-        console.log(profile);
-        localStorage.setItem("JWT", profile.sessionID);
+        if(profile.sessionID) {
+          console.log(profile);
+          localStorage.setItem("JWT", profile.sessionID);
+          
+          //redirect to dashboard
+          this.router.navigateByUrl('/dashboard');
+        }
+      }, (error) => {
+        alert("Login Credentials are Incorrect");
       }
     )
 
