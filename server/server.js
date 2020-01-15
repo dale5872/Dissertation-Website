@@ -3,18 +3,13 @@ const session = require('express-session');
 const bodyParser = require('body-parser');
 const Promise = require('promise');
 const tediousStore = require('connect-tedious')(session);
+const cors = require('cors');
 
 const app = express();
 
 const Login = require('./auth/login.js');
 const UserProfile = require('./auth/userProfile.js');
 const Registration = require('./auth/registration.js');
-const Connector = require('./connections/databaseConnector.js');
-
-const connector = new Connector();
-const connectorConfig = connector.getConfig();
-
-console.log(connectorConfig);
 
 global.DEBUG_FLAG = true;
 global.DEBUG_LEVEL = 1; //1 = EVERYTHING, 2 = MAIN OPERATIONS
@@ -58,6 +53,8 @@ app.use(express.urlencoded({
 }));
 app.use(bodyParser.urlencoded({extended : true}));
 app.use(bodyParser.json());
+const corsWhiteList = ['http://localhost:4200', 'http://127.0.0.1:4200', 'http://51.11.10.177:4200'];
+app.use(cors(corsWhiteList));
 
 //-----------------------------------------------
 //----------------- DEFINED CONTROLLERS ---------
