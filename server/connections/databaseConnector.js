@@ -9,7 +9,7 @@ class Connector {
             authentication: {
                 options: {
                     userName: "dale",
-                    password: "EdenHazard10"
+                    password: "[REDACTED]"
                 },
                 type: "default"
             },
