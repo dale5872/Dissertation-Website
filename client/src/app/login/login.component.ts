@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ApplicationRef } from '@angular/core';
 import { AuthenticationService } from '../_service/authentication.service';
 import { SessionService } from '../_service/session.service';
 import { Router } from '@angular/router';
@@ -20,7 +20,8 @@ export class LoginComponent implements OnInit {
     private authService: AuthenticationService, 
     private session: SessionService,
     private router: Router,
-    private formBuilder: FormBuilder
+    private formBuilder: FormBuilder,
+    private ref: ApplicationRef
   ) { 
     this.loginForm = this.createForm();
   }
@@ -65,11 +66,11 @@ export class LoginComponent implements OnInit {
     const loginRequest = Object.assign({}, this.loginForm.value);
     const loginProfile: LoginModel = Object.assign({}, loginRequest.loginControls);
 
-
     this.authService.login(loginProfile.username, loginProfile.password).subscribe(
       (profile: User) => {
         if(profile.sessionID) {
-          localStorage.setItem("JWT", profile.sessionID);
+          //start the session
+          this.session.beginSession(profile);
           
           //redirect to dashboard
           this.router.navigateByUrl('/dashboard');
