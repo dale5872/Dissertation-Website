@@ -10,6 +10,7 @@ const app = express();
 const Login = require('./auth/login.js');
 const UserProfile = require('./auth/userProfile.js');
 const Registration = require('./auth/registration.js');
+const UserInformation = require('./auth/userInformation.js');
 
 global.DEBUG_FLAG = true;
 global.DEBUG_LEVEL = 1; //1 = EVERYTHING, 2 = MAIN OPERATIONS
@@ -33,6 +34,12 @@ if(global.DEBUG_LEVEL) {
 //-----------------------------------------------
 app.use(session({ 
     secret: 'alskdjghfjlr92345n34£C£(Tegwegcnuerlty3p4t8cnREG[eqEQ{P|[;q9ocruwW|";QW[0ciq0[ewqw[cQW{PRCr',
+    cookie: {
+        path: '/',
+        httpOnly: true,
+        secure: false, //REQUIRES HTTPS
+        maxAge: 3600000 //1 hour
+    },
     store: new tediousStore({
         config: {
             userName: 'dale',
@@ -53,8 +60,19 @@ app.use(express.urlencoded({
 }));
 app.use(bodyParser.urlencoded({extended : true}));
 app.use(bodyParser.json());
-const corsWhiteList = ['http://localhost:4200', 'http://127.0.0.1:4200', 'http://51.11.10.177:4200'];
-app.use(cors(corsWhiteList));
+
+const whitelist = ['http://localhost:4200', 'http://127.0.0.1:4200', 'http://51.11.10.177:4200'];
+var corsOptions = {
+  origin: function (origin, callback) {
+    if (whitelist.indexOf(origin) !== -1) {
+      callback(null, true)
+    } else {
+      callback(new Error('Not allowed by CORS'))
+    }
+  }, 
+  credentials: true
+}
+app.use(cors(corsOptions));
 
 //-----------------------------------------------
 //----------------- DEFINED CONTROLLERS ---------
@@ -73,12 +91,6 @@ app.get('/',function(req,res) {
 //----------------- API ROUTES ------------------
 //-----------------------------------------------
 app.route('/api/auth/login').post(function(req, res) {
-    if(req.session.userID) {
-        if(global.DEBUG_FLAG && global.DEBUG_LEVEL == 1) {
-            console.log(`User ${req.session.userID} is already logged in`);
-        }
-        return res.status(401).send("Already Authenticated");
-    }
     var username = req.body.username;
     var password = req.body.password;
     
@@ -131,6 +143,34 @@ app.route('/api/auth/register').post(function(req, res) {
         res.send(message);
     });
 
+});
+
+app.route('/api/auth/userinformation').post((req, res) => {
+    if(global.DEBUG_FLAG && global.DEBUG_LEVEL == 1) {
+        if(req.session) {
+            console.log(`DEBUG LEVEL 1: Fetching User Information, cookie is present`);
+        } else {
+            console.log(`DEBUG LEVEL 1: Fetching User Information, cookie is not present`);
+        }
+    }
+
+    if(req.session.userID) {
+        var userinfo = new UserInformation(req.session.userID);
+        userinfo.retrieve().then((profile) => {
+            var responseObject = {
+                userProfile: profile
+            };
+
+            res.status(200).send(JSON.stringify(responseObject));
+        }).catch((e) => {
+            res.status(401).send(e.message);
+        });
+    } else {
+        if(global.DEBUG_FLAG && global.DEBUG_LEVEL == 1) {
+            console.log(`DEBUG LEVEL 1: UserID was not present in cookie`);
+        }
+    res.status(401).send("Missing User Cookie");
+    }
 });
 
 app.listen(3000);

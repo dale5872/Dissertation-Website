@@ -81,7 +81,7 @@ class Login {
         
             //execute our defined Request
             connection.execSql(request);
-        })
+        });
     }
 }
 

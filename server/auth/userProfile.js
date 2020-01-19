@@ -82,7 +82,6 @@ class UserProfile {
  
     generateProfile() {
         return {
-            userID: this._userID,
             username: this._username,
             fname: this._fname,
             lname: this._lname,
