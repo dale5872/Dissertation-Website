@@ -1,8 +1,8 @@
 export class User {
     userID: number;
     username: string;
-    firstName: string;
-    lastName: string;
+    fname: string;
+    lname: string;
     email: string;
     lecturer: string;
     sessionID: string;

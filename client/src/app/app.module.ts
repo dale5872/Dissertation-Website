@@ -12,6 +12,8 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { AuthGuard } from './_guards/auth.guard';
 
+import { CookieService } from 'ngx-cookie-service';
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -28,7 +30,8 @@ import { AuthGuard } from './_guards/auth.guard';
     FormsModule
   ],
   providers: [
-    AuthGuard
+    AuthGuard,
+    CookieService
   ],
   bootstrap: [AppComponent]
 })

@@ -1,6 +1,9 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 
+import { CookieService } from 'ngx-cookie-service';
+import { triggerAsyncId } from 'async_hooks';
+
 const TOKEN = 'TOKEN';
 
 @Injectable({
@@ -9,40 +12,64 @@ const TOKEN = 'TOKEN';
 export class SessionService {
   private _isAuthenticatedSubject: BehaviorSubject<boolean>;
   private isAuthenticated: Observable<boolean>;
-
-  constructor() { 
+  
+  constructor(
+    private cookieService: CookieService
+  ) { 
     this._isAuthenticatedSubject = new BehaviorSubject<boolean>(false);
     this.isAuthenticated = this._isAuthenticatedSubject.asObservable();
   }
 
+  getUsername() {
+    return JSON.parse(this.cookieService.get("fbh_pf")).username;
+  }
+
+  getFirstName() {
+    return JSON.parse(this.cookieService.get("fbh_pf")).fname;
+  }
+
+  getLastName() {
+    return JSON.parse(this.cookieService.get("fbh_pf")).lname;
+  }
+
+  getEmail() {
+    return JSON.parse(this.cookieService.get("fbh_pf")).email;
+  }
+
+  /**
+   * Takes the user profile and stores them in cookies for use within the app
+   * @param profile Class storing the logged in users information
+   */
   beginSession(profile) {
-    localStorage.setItem("JWT", profile.sessionID);
-    sessionStorage.setItem("username", profile.username);
-    sessionStorage.setItem("firstName", profile.firstName);
-    sessionStorage.setItem("lastName", profile.lastName);
-    sessionStorage.setItem("email", profile.email);    
+    this.cookieService.set("fbh_pf", JSON.stringify(profile));
     this._isAuthenticatedSubject.next(true);
   }
 
+  /**
+   */
   isLoggedIn() {
-    return localStorage.getItem("JWT") != null;
-  }
-
-  isLoggedInObservable() {
-    if(localStorage.getItem("JWT") != null) {
+    if(this.cookieService.check("fbh_pf") != null) {
       this._isAuthenticatedSubject.next(true);
-    } else {
-      this._isAuthenticatedSubject.next(false);
+      return true;
     }
 
+    return false;
+  }
+
+  /**
+   */
+  isLoggedInObservable() {
+    if(this.cookieService.check("fbh_pf") != null) {
+      this._isAuthenticatedSubject.next(true);
+    }
+    this._isAuthenticatedSubject.next(false);
     return this.isAuthenticated;
   }
 
+  /**
+   */
   logout() {
-    if(this.isLoggedIn()) {
-      localStorage.clear();
-      sessionStorage.clear();
-      this._isAuthenticatedSubject.next(false);
-    }
+    this.cookieService.deleteAll();
+    this._isAuthenticatedSubject.next(false);
   }
 }
