@@ -8,21 +8,40 @@
 <!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
 
 <!-- Toolbar -->
-<div>
-  <nav class="navbar fixed-top navbar-expand-lg navbar-dark bg-dark">
-    <a class="navbar-brand" routerLink="/">FeedbackHub</a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-      <div class="navbar-nav">
+<nav class="navbar fixed-top navbar-expand-lg navbar-dark bg-dark">
+  <a class="navbar-brand" routerLink="/">FeedbackHub</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+    <div class="navbar-nav">
+      <ng-template [ngIf]="!isAuthenticated">
         <a class="nav-item nav-link active" routerLink="/login">Login</a>
         <a class="nav-item nav-link active" routerLink="/register">Register</a>
-
-      </div>
+      </ng-template>
+      
+      <ng-template [ngIf]="isAuthenticated">
+        <div ngbDropdown class="nav-item">
+          <a class="nav-link drodown-toggle" id="navUserDropdown" ngbDropdownToggle>{{getUsername()}}</a>
+          <div ngbDropdownMenu aria-labelledby="navUserDropdown">
+            <div class="container">
+              <div class="row">
+                <a class="dropdown-item">{{getFirstName()}} {{getLastName()}} <br />
+                  ({{getUsername()}})
+                </a>
+              </div>
+            </div>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item">Account Preferences</a>
+            <a class="dropdown-item text-danger" (click)="logout()">Logout</a>
+          </div>
+        </div>
+      </ng-template>
     </div>
-  </nav>
-</div>
+  </div>
+</nav>
+
 
 <!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
 <!-- * * * * * * * * * * * The content above * * * * * * * * * * * -->

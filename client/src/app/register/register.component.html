@@ -1,26 +1,31 @@
 <div class="col-12">
     <div class="d-flex justify-content-center">
         <div class="col-6">
-            <form>
-                <div class="form-group">
+            <form [formGroup]="registrationForm">
+                <div class="form-group" formGroupName="registerControls">
                     <label for="username">Username:</label>
-                    <input type="text" class="form-control" id="username_login" placeholder="john.doe">
-                </div>
-                <div class="form-group">
+                    <input type="text" class="form-control" formControlName="username" placeholder="john.doe">
+                    
                     <label for="password">Password:</label>
-                    <input type="password" class="form-control" id="password_login">
-                </div>
-                <div class="form-group">
+                    <input type="password" class="form-control" formControlName="password">
+
+                    <!-- @todo: Add Password Verification
+                        Currently, no verification is carried out on the client side -->
                     <label for="password">Verify Password:</label>
                     <input type="password" class="form-control" id="verify_password_login">
-                </div>
-                <div class="form-group">
+
                     <label for="password">Email:</label>
-                    <input type="email" class="form-control" id="email_login">
+                    <input type="email" class="form-control" formControlName="email">
                     <small id="passtip" class="form-text text-muted">Registration information is encrypted using the most secure encryption standards.</small>
+
+                    <label for="fname">First Name:</label>
+                    <input type="text" class="form-control" formControlName="firstName">
+                    
+                    <label for="lname">Last Name:</label>
+                    <input type="text" class="form-control" formControlName="lastName">
                 </div>
 
-                <button type="submit" class="btn btn-primary">Register</button>
+                <button type="submit" class="btn btn-primary" (click)="register()">Register</button>
             </form>
         </div>
     </div>
