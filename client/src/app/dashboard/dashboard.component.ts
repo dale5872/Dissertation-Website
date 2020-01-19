@@ -3,6 +3,8 @@ import { HttpClient } from '@angular/common/http';
 
 import { User } from '../_models/user';
 
+import { HttpService } from '../_service/http.service';
+
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
@@ -13,7 +15,7 @@ export class DashboardComponent implements OnInit {
   cookieTestResult = "";
 
   constructor(
-    private http: HttpClient
+    private http: HttpService
    ) { }
 
   ngOnInit() {
@@ -22,13 +24,6 @@ export class DashboardComponent implements OnInit {
   cookieTest() {
     this.isCookieTest = true;
 
-    this.http.post('http://51.11.10.177:3000/api/auth/userInformation',{}, {
-      withCredentials: true
-    }).subscribe((data: any) => { //data: any is NOT recommended, but possible
-      console.log(data);
-      this.cookieTestResult = `${data.userProfile.username}, ${data.userProfile.fname}, ${data.userProfile.lname}`;
-    });
-
+    this.http.post('api/auth/userInformation', {});
   }
-
 }

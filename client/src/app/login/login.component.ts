@@ -70,7 +70,7 @@ export class LoginComponent implements OnInit {
       (profile: User) => {
         if(profile.sessionID) {
           //start the session
-          this.session.beginSession(profile);
+          this.session.setSessionData(profile);
           
           //redirect to dashboard
           this.router.navigateByUrl('/dashboard');

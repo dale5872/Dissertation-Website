@@ -40,12 +40,11 @@ export class SessionService {
    * Takes the user profile and stores them in cookies for use within the app
    * @param profile Class storing the logged in users information
    */
-  beginSession(profile: User) {
+  setSessionData(profile: User) {
     sessionStorage.setItem("username", profile.username);
     sessionStorage.setItem("fname", profile.fname);
     sessionStorage.setItem("lname", profile.lname);
     sessionStorage.setItem("email", profile.email);
-    
     this._isAuthenticatedSubject.next(true);
   }
 
