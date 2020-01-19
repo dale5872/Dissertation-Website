@@ -2,21 +2,23 @@
     <div class="row">
         <!-- @todo: Add CSS Styling for Sidebar (pos: fixed, overflow-y) -->
         <div class="col-sm-3 bg-light mx-0">
-            <p>Container!</p>
-            <p>Container!</p>
-            <p>Container!</p>
-            <p>Container!</p>
-            <p>Container!</p>
-            <p>Container!</p>
-            <p>Container!</p>
-            <p>Container!</p>
-            <p>Container!</p>
-            <p>Container!</p>
-            <p>Container!</p>
+            <div class="list-group">
+                <button type="button" class="list-group-item list-group-item-action" ngbButton (click)="cookieTest()">Cookie Test</button>
+                <button type="button" class="list-group-item list-group-item-action"></button>
+                <button type="button" class="list-group-item list-group-item-action"></button>
+                <button type="button" class="list-group-item list-group-item-action"></button>
+                <button type="button" class="list-group-item list-group-item-action"></button>
+            </div>
         </div>
 
         <div class="col-sm-9 col-sm-offset-3">
             <h2>Welcome to FeedbackHub!</h2>
+
+            <ng-template [ngIf]="isCookieTest">
+                <div class="row">
+                    {{cookieTestResult}}
+                </div>
+            </ng-template>
         </div>
     </div>
 </div>

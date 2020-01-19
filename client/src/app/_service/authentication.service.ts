@@ -17,6 +17,8 @@ export class AuthenticationService {
     return this.http.post<User>('http://51.11.10.177:3000/api/auth/login', {
       username: username,
       password: password
+    }, {
+      withCredentials: true
     });
   }
 
@@ -26,7 +28,9 @@ export class AuthenticationService {
       password: profile.password,
       email: profile.email,
       fname: profile.firstName,
-      lname: profile.lastName
+      lname: profile.lastName,
+    }, {
+      withCredentials: true
     });
   }
 }
