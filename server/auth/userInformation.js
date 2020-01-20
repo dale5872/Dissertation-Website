@@ -25,8 +25,8 @@ class UserInformation {
         const obj = this;
 
         return new Promise((resolve, reject) => {
-            if(global.DEBUG_FLAG && global.DEBUG_LEVEL == 1) {
-                console.log(`DEBUG LEVEL 1: Retrieving User Information From Cookie`);
+            if(global.DEBUG_FLAG) {
+                console.log(`DEBUG: Retrieving User Information From Cookie`);
             }
             
             //create a new Request for our SQL Query
@@ -43,8 +43,8 @@ class UserInformation {
                         reject("An unknown error has occured. Contact an administrator for help");
                     } else {
                         if(rowCount !== 1) {
-                            if(global.DEBUG_FLAG && global.DEBUG_LEVEL == 1) {
-                                console.error(`DEBUG LEVEL 1: User ${obj.userID} was not retirieved. A Fatal Error has Occured :31`);
+                            if(global.DEBUG_FLAG) {
+                                console.error(`DEBUG: User ${obj.userID} was not retirieved. A Fatal Error has Occured :31`);
                             }
                             reject(`A Fatal Error has Occured! :31`);
                         }
@@ -59,8 +59,8 @@ class UserInformation {
                 userProfile.lname = columns[2].value;
                 userProfile.email = columns[3].value;
                         
-                if(global.DEBUG_FLAG && global.DEBUG_LEVEL == 1) {
-                    console.log(`DEBUG LEVEL 1: User profile has been fetched for ${obj._userID}`);
+                if(global.DEBUG_FLAG) {
+                    console.log(`DEBUG: User profile has been fetched for ${obj._userID}`);
                 }
 
                 resolve(userProfile.generateProfile());

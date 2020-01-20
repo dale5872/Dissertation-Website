@@ -28,8 +28,8 @@ class Registration {
             throw new Error("Failed to register the user");
         }
 
-        if(global.DEBUG_FLAG && global.DEBUG_LEVEL == 1) {
-            console.log(`DEBUG LEVEL 1: Closing Database Connection`);
+        if(global.DEBUG_FLAG) {
+            console.log(`DEBUG: Closing Database Connection`);
         }
         connection.close();
     }
@@ -42,8 +42,8 @@ class Registration {
      */
     async createAccountTransaction(connection) {
         return new Promise((resolve, reject) => {
-            if(global.DEBUG_FLAG && global.DEBUG_LEVEL == 1) {
-                console.log(`DEBUG LEVEL 1: Registration Promise accepted, now registering`);
+            if(global.DEBUG_FLAG) {
+                console.log(`DEBUG: Registration Promise accepted, now registering`);
             }
     
             connection.beginTransaction((err) => {
@@ -63,9 +63,9 @@ class Registration {
                             console.error("ERROR: An SQL Error Has Occured");
                             console.error(err.message);
                             console.error(`ERROR: Location registration.js, INSERT INTO user_accounts...`);
-                            if(global.DEBUG_FLAG && global.DEBUG_LEVEL == 1) {
-                                console.log(`DEBUG LEVEL 1: Rolling back transaction...`);
-                                console.log(`DEBUG LEVEL 1: Username ${this.profile.username}' was already taken`);
+                            if(global.DEBUG_FLAG) {
+                                console.log(`DEBUG: Rolling back transaction...`);
+                                console.log(`DEBUG: Username ${this.profile.username}' was already taken`);
                             }
 
                             //we have an error, rollback the transaction
@@ -73,23 +73,23 @@ class Registration {
                                 if(err) {
                                     console.error(`ERROR: A FATAL ERROR HAS OCCURED`);
                                     console.error(`${err.message}`);
-                                    if(global.DEBUG_FLAG && global.DEBUG_LEVEL == 1) {
-                                        console.log(`DEBUG LEVEL 1: Failed to rollback`);
+                                    if(global.DEBUG_FLAG) {
+                                        console.log(`DEBUG: Failed to rollback`);
                                     }
                                     reject("An unknown error has occured. Contact an administrator for help");
                                 } else {
                                     //The username was already taken
                                     console.log();
-                                    if(global.DEBUG_FLAG && global.DEBUG_LEVEL == 1) {
-                                        console.log(`DEBUG LEVEL 1: Rollbacked successfully`);
+                                    if(global.DEBUG_FLAG) {
+                                        console.log(`DEBUG: Rollbacked successfully`);
                                     }
                                     reject(`This username '${this.profile.username}' has already been taken.`);
                                 }
                             });
                         } else {
-                            if(global.DEBUG_FLAG && global.DEBUG_LEVEL == 1) {
-                                console.log(`DEBUG LEVEL 1: User Account has been created -> ${this.profile.username}`);
-                                console.log(`DEBUG LEVEL 1: Inserting User Information`);
+                            if(global.DEBUG_FLAG) {
+                                console.log(`DEBUG: User Account has been created -> ${this.profile.username}`);
+                                console.log(`DEBUG: Inserting User Information`);
                             }
 
                             //we have created the account, now we create a new request to insert the user's information
@@ -101,41 +101,41 @@ class Registration {
                                         console.error("ERROR: An SQL Error Has Occured");
                                         console.error(err.message);
                                         console.error(`ERROR: Location registration.js, INSERT INTO user_information...`);
-                                        console.log(`DEBUG LEVEL 1: Rolling Back Transaction...`);
+                                        console.log(`DEBUG: Rolling Back Transaction...`);
 
                                         //we have failed, rollback the transaction
                                         connection.rollbackTransaction((err) => {
                                             if(err) {
                                                 console.error(`ERROR: A FATAL ERROR HAS OCCURED`);
                                                 console.error(`${err.message}`);            
-                                                if(global.DEBUG_FLAG && global.DEBUG_LEVEL == 1) {
-                                                    console.log(`DEBUG LEVEL 1: Failed to rollback`);
+                                                if(global.DEBUG_FLAG) {
+                                                    console.log(`DEBUG: Failed to rollback`);
                                                 }
                                                 reject("An unknown error has occured. Contact an administrator for help");
                                             } else {
                                                 //Not really sure why this would fail...
-                                                if(global.DEBUG_FLAG && global.DEBUG_LEVEL == 1) {
-                                                    console.log(`DEBUG LEVEL 1: Rolled back successfully`);
+                                                if(global.DEBUG_FLAG) {
+                                                    console.log(`DEBUG: Rolled back successfully`);
                                                 }
                                                 reject("An unknown error has occured. Contact an administrator for help");
                                             }
                                         });
                                     } else {
-                                        if(global.DEBUG_FLAG && global.DEBUG_LEVEL == 1) {
-                                            console.log(`DEBUG LEVEL 1: User Information has been inserted ${this.profile.username} -> ${this.profile.userID}`);
+                                        if(global.DEBUG_FLAG) {
+                                            console.log(`DEBUG: User Information has been inserted ${this.profile.username} -> ${this.profile.userID}`);
                                         }
                                         //we can now commit the transaction to the database
                                         connection.commitTransaction((err) => {
                                             if(err) {
                                                 console.error(`ERROR: A FATAL ERROR HAS OCCURED`);
                                                 console.error(`${err.message}`);            
-                                                if(global.DEBUG_FLAG && global.DEBUG_LEVEL == 1) {
-                                                    console.log("DEBUG LEVEL 1: Failed to Commit Transaction. Rolling back...");
+                                                if(global.DEBUG_FLAG) {
+                                                    console.log("DEBUG: Failed to Commit Transaction. Rolling back...");
                                                 }
                                                 reject("An unknown error has occured. Contact an administrator for help");
                                             } else {
-                                                if(global.DEBUG_FLAG && global.DEBUG_LEVEL == 1) {
-                                                    console.log("DEBUG LEVEL 1: Commited Transaction");
+                                                if(global.DEBUG_FLAG) {
+                                                    console.log("DEBUG: Commited Transaction");
                                                 }
                                                 resolve("User account created successfully.");
                                             }
@@ -155,8 +155,8 @@ class Registration {
                     request1.on('row', (columns) => {
                         this.profile.userID = columns[0].value;
                         
-                        if(global.DEBUG_FLAG && global.DEBUG_LEVEL == 1) {
-                            console.log(`DEBUG LEVEL 1: USER ID has been generated for ${this.profile.username} -> ${this.userID}`);
+                        if(global.DEBUG_FLAG) {
+                            console.log(`DEBUG: USER ID has been generated for ${this.profile.username} -> ${this.userID}`);
                         }
                 });
         
