@@ -42,6 +42,12 @@
   </div>
 </nav>
 
+<!-- @todo: Create a location for the alerts -->
+<div class="float-right mt-5" style="position:fixed; right:0; z-index:3000">
+  <div class="col-sm-3 offset-col-9">
+    <toast-message-component [alerts]="messageList"></toast-message-component>
+  </div>
+</div>
 
 <!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
 <!-- * * * * * * * * * * * The content above * * * * * * * * * * * -->

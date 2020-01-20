@@ -1,5 +1,6 @@
 import { Injectable, getModuleFactory } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { BootstrapAlertService } from 'ngx-bootstrap-alert-service';
 
 import { User } from '../_models/user';
 import { SessionService } from './session.service';
@@ -12,7 +13,8 @@ export class HttpService {
 
   constructor(
     private http: HttpClient,
-    private session: SessionService
+    private session: SessionService,
+    private alertService: BootstrapAlertService
   ) { }
 
   /**
@@ -59,9 +61,12 @@ export class HttpService {
       withCredentials: true,
       responseType: 'text'
     }).subscribe((res: any) => {
-      console.log(res.body);
+      //show status to user
+      this.alertService.showSucccess("File Uploaded Successfully");
       return res.body;
     }, (error) => {
+      //show error to user
+      this.alertService.showError("Failed to upload file");
       throw new Error(error.message);
     });
   }

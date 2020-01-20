@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
+import { BootstrapAlertService, ToastMessageModel } from 'ngx-bootstrap-alert-service';
 
 import { SessionService } from './_service/session.service';
 import { CookieService } from 'ngx-cookie-service';
@@ -13,11 +14,13 @@ import { CookieService } from 'ngx-cookie-service';
 export class AppComponent implements OnInit {
   isAuthenticated: boolean;
   title = 'client';
+  messageList: ToastMessageModel[] = [];
 
   constructor(
     private session: SessionService,
     private router: Router,
-    private cookieService: CookieService
+    private cookieService: CookieService,
+    private alertService: BootstrapAlertService
   ) { }
 
   ngOnInit() {
@@ -25,6 +28,10 @@ export class AppComponent implements OnInit {
       this.isAuthenticated = isAuth
     });
 
+    //sets up the alert system
+    this.alertService.getAlertEvent().subscribe(r => {
+      this.messageList.push(r);
+    });
   }
 
   /**
