@@ -28,6 +28,8 @@ export class HttpService {
       this.session.setSessionData(userProfile);
 
       return res.body;
+    }, (error) => {
+      throw new Error(error.message);
     });
   }
 

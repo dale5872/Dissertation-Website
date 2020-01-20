@@ -14,7 +14,6 @@ export class AuthGuard implements CanActivate {
         const redirectURL = route['_routerState']['url'];
 
         if(this.sessionService.isLoggedIn()) {
-            console.log("Logged in");
             return true;
         }
 
