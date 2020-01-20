@@ -28,8 +28,8 @@ class Login {
             throw new Error("Authentication Failed");
         }
 
-        if(global.DEBUG_FLAG && global.DEBUG_LEVEL == 1) {
-            console.log(`DEBUG LEVEL 1: Closing Database Connection`);
+        if(global.DEBUG_FLAG) {
+            console.log(`DEBUG: Closing Database Connection`);
         }
         connection.close();
         return outputMessage;
@@ -38,8 +38,8 @@ class Login {
     async authenticateUser(connection) {
         const obj = this;
         return new Promise(function(resolve, reject) {
-            if(global.DEBUG_FLAG && global.DEBUG_LEVEL == 1) {
-                console.log(`DEBUG LEVEL 1: Login Promise accepted, now authenticating`);
+            if(global.DEBUG_FLAG) {
+                console.log(`DEBUG: Login Promise accepted, now authenticating`);
             }
             
             //create a new Request for our SQL Query
@@ -56,8 +56,8 @@ class Login {
                         reject("An unknown error has occured. Contact an administrator for help");
                     } else {
                         if(rowCount !== 1) {
-                            if(global.DEBUG_FLAG && global.DEBUG_LEVEL == 1) {
-                                console.error(`DEBUG LEVEL 1: User ${obj.username} was not authenticated`);
+                            if(global.DEBUG_FLAG) {
+                                console.error(`DEBUG: User ${obj.username} was not authenticated`);
                             }
                             reject(`Login failed! The username and password combination is incorrect!`);
                         }
@@ -71,8 +71,8 @@ class Login {
                 obj._profile.lname = columns[2].value;
                 obj._profile.email = columns[3].value;
                         
-                if(global.DEBUG_FLAG && global.DEBUG_LEVEL == 1) {
-                    console.log(`DEBUG LEVEL 1: USER ID has been fetched for ${obj._profile.username} -> ${obj._profile.userID}`);
+                if(global.DEBUG_FLAG) {
+                    console.log(`DEBUG: USER ID has been fetched for ${obj._profile.username} -> ${obj._profile.userID}`);
                 }
 
                 resolve();
