@@ -19,7 +19,6 @@ import { CookieService } from 'ngx-cookie-service';
     AppComponent,
     LoginComponent,
     RegisterComponent,
-    DashboardComponent
   ],
   imports: [
     BrowserModule,
