@@ -56,7 +56,7 @@ class Registration {
         
                 //lets create a new request for creating the user account
                 var request1 = new Request(
-                    `INSERT INTO feedbackhub.user_accounts VALUES ('${this.profile.username}', '${this.profile.password}', '${accType}'); 
+                    `INSERT INTO feedbackhub.user_accounts VALUES ('${this.profile.username}', '${this.profile.password}'); 
                     SELECT @@IDENTITY;`,
                     (err) => {
                         if(err) {

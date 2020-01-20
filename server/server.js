@@ -129,14 +129,13 @@ app.route('/api/auth/register').post(function(req, res) {
     var email = req.body.email;
     var fname = req.body.fname;
     var lname = req.body.lname;
-    var lecturer = req.body.lecturer;
 
     if(global.DEBUG_FLAG) {
         console.log(`Recieved Registration Request from ${fname} ${lname}`);
     }
 
     var profile = new UserProfile();
-    profile.registerProfile(username, password, fname, lname, email, lecturer);
+    profile.registerProfile(username, password, fname, lname, email);
 
     var reg = new Registration(profile);
     reg.register().then((message) => {

@@ -31,7 +31,7 @@ class UserInformation {
             
             //create a new Request for our SQL Query
             var request = new Request(
-                `SELECT a.username, i.firstName, i.lastName, i.email, a.account_Type
+                `SELECT a.username, i.firstName, i.lastName, i.email
                 FROM (feedbackhub.user_accounts AS a
                      INNER JOIN feedbackhub.user_information AS i
                          ON a.user_ID = i.user_ID)
@@ -58,7 +58,6 @@ class UserInformation {
                 userProfile.fname = columns[1].value;
                 userProfile.lname = columns[2].value;
                 userProfile.email = columns[3].value;
-                userProfile.lecturer = columns[4].value;
                         
                 if(global.DEBUG_FLAG && global.DEBUG_LEVEL == 1) {
                     console.log(`DEBUG LEVEL 1: User profile has been fetched for ${obj._userID}`);
