@@ -1,8 +1,9 @@
-import { Injectable } from '@angular/core';
+import { Injectable, getModuleFactory } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
 import { User } from '../_models/user';
 import { SessionService } from './session.service';
+import { ThrowStmt } from '@angular/compiler';
 
 @Injectable({
   providedIn: 'root'
@@ -48,5 +49,20 @@ export class HttpService {
       return res.body;
     });
   }
-  
+
+  uploadFile(file: File): any {
+    //File must be added to a FormData object to be sent to the server
+    let formData = new FormData();
+    formData.append('file', file, file.name);
+
+    this.http.post("http://51.11.10.177:3000/api/uploadfile", formData, {
+      withCredentials: true,
+      responseType: 'text'
+    }).subscribe((res: any) => {
+      console.log(res.body);
+      return res.body;
+    }, (error) => {
+      throw new Error(error.message);
+    });
+  }
 }
