@@ -6,16 +6,14 @@ class UserProfile {
         this._fname;
         this._lname;
         this._email;
-        this._lecturer;
     }
 
-    registerProfile(username, password, fname, lname, email, lecturer) {
+    registerProfile(username, password, fname, lname, email) {
         this._username = username;
         this._password = password;
         this._fname = fname;
         this._lname = lname;
         this._email = email;
-        this._lecturer = lecturer;
     }
 
     loginProfile(username, password) {
@@ -71,23 +69,13 @@ class UserProfile {
     get email() {
         return this._email;
     }
-
-    set lecturer(lecturer) {
-        this._lecturer = lecturer;
-    }
-
-    get lecturer() {
-        return this._lecturer;
-    }
  
     generateProfile() {
         return {
-            userID: this._userID,
             username: this._username,
             fname: this._fname,
             lname: this._lname,
             email: this._email,
-            lecturer: this._lecturer
         }
     }
 }
