@@ -23,7 +23,7 @@ class FetchImports {
                 console.log("DEBUG: Fetching Imports from Database");
             }
 
-            var request = new Request(`SELECT i.import_Date, i.import_method, i.status
+            var request = new Request(`SELECT i.import_Date, i.import_method, i.status, i.filename, i.responses
             FROM feedbackhub.import AS i
             WHERE i.user_ID = 47`, (err, rowCount, rows) => {
                 if(err) {
@@ -43,7 +43,9 @@ class FetchImports {
                                 {
                                     importDate: column[0].value,
                                     importMethod: column[1].value,
-                                    status: column[2].value
+                                    status: column[2].value,
+                                    filename: column[3].value,
+                                    responses: column[4].value
                                 }
                             )
                         });
