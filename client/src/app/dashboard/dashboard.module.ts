@@ -4,12 +4,14 @@ import { CommonModule } from '@angular/common';
 import { DashboardRoutingModule } from './dashboard-routing.module';
 import { DashboardComponent } from './dashboard.component';
 import { UploadfileComponent } from './uploadfile/uploadfile.component';
+import { ViewuploadsComponent } from './viewuploads/viewuploads.component';
 
 
 @NgModule({
   declarations: [
     DashboardComponent,
-    UploadfileComponent
+    UploadfileComponent,
+    ViewuploadsComponent
   ],
   imports: [
     CommonModule,
