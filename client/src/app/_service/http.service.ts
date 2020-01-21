@@ -4,7 +4,7 @@ import { BootstrapAlertService } from 'ngx-bootstrap-alert-service';
 
 import { User } from '../_models/user';
 import { SessionService } from './session.service';
-import { ThrowStmt } from '@angular/compiler';
+import { HttpReturn } from '../_models/httpReturn';
 
 @Injectable({
   providedIn: 'root'
@@ -26,11 +26,11 @@ export class HttpService {
   post(url: string, body: Object): any {
     this.http.post("http://51.11.10.177:3000/" + url, body, {
       withCredentials: true
-    }).subscribe((res: any) => {
+    }).subscribe((res: HttpReturn) => {
       var userProfile: User = res.userProfile;
       this.session.setSessionData(userProfile);
 
-      return res.body;
+      return res.dataObject;    
     }, (error) => {
       throw new Error(error.message);
     });
@@ -41,21 +41,26 @@ export class HttpService {
    * while also updating any session information
    * @param url URL path on the server to send request to
    */
-  get(url: string) {
-    this.http.get("http://51.11.10.177:3000/" + url, {
-      withCredentials: true
-    }).subscribe((res: any) => {
-      var userProfile: User = res.userProfile;
-      this.session.setSessionData(userProfile);
-
-      return res.body;
+  get(url: string): Promise<any> {
+    return new Promise((resolve, reject) => {
+      this.http.get("http://51.11.10.177:3000/" + url, {
+        withCredentials: true
+      }).subscribe((res: HttpReturn) => {
+        var userProfile: User = res.userProfile;
+        this.session.setSessionData(userProfile);
+  
+        resolve(res.dataObject);
+      }, (error) => {
+        reject(error.message);
+      });
     });
-  }
+ }
 
-  uploadFile(file: File): any {
+  uploadFile(file: File, filename: string): any {
     //File must be added to a FormData object to be sent to the server
     let formData = new FormData();
     formData.append('file', file, file.name);
+    formData.append('filename', filename)
 
     this.http.post("http://51.11.10.177:3000/api/uploadfile", formData, {
       withCredentials: true,

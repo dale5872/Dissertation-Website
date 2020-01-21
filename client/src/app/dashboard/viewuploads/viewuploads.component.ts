@@ -23,7 +23,6 @@ export class ViewuploadsComponent implements OnInit {
 
   async fetchImports() {
     let jsonImports = await this.http.get('api/fetchimports');
-    console.log("Fetched DATA");
     this.imports = jsonImports.imports;
   }
 

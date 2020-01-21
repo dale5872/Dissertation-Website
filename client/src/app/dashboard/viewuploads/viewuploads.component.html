@@ -6,7 +6,7 @@
                     <div class="card-body">
                         <div class="row">
                             <h5 class="card-title">
-                                Example Upload
+                                {{import.filename}}
                                 <h6 class="card-subtitle text-success">
                                     {{import.status}}
                                 </h6>
@@ -14,7 +14,7 @@
                         </div>
                         <div class="row">
                             <div class="col-sm-3">
-                                <p class="card-text">Items Processed: 49</p>
+                                <p class="card-text">Items Processed: {{import.responses}}</p>
                             </div>
                             <div class="col-sm-3">
                                 <p class="card-text">Import Date: {{import.importDate}}</p>

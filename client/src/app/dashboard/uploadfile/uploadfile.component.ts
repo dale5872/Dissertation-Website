@@ -25,7 +25,7 @@ export class UploadfileComponent implements OnInit {
 
   upload() {
     try {
-      this.http.uploadFile(this.selectedFile);
+      this.http.uploadFile(this.selectedFile, this.filename);
     } catch (error) {
       // @todo : Do some proper error catching here
       console.log(error);
