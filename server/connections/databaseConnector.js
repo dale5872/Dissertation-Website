@@ -16,7 +16,8 @@ class Connector {
             server: "feedback-hub.database.windows.net",
             options: {
                 database: "FeedbackHub",
-                encrypt: true
+                encrypt: true,
+                rowCollectionOnRequestCompletion: true
             }
         };
         return config;
@@ -28,8 +29,8 @@ class Connector {
             //the connection is established before running queries
             var connection = new Connection(this.getConfig());
 
-            if(global.DEBUG_FLAG && global.DEBUG_LEVEL == 1) {
-                console.log("DEBUG LEVEL 1: Connecting to Database...");
+            if(global.DEBUG_FLAG) {
+                console.log("DEBUG: Connecting to Database...");
             }
 
             connection.on("connect", function(err) {
@@ -38,8 +39,8 @@ class Connector {
                     console.error(err.message);
                     reject();
                 } else {
-                    if(global.DEBUG_FLAG && global.DEBUG_LEVEL == 1) {
-                        console.log("DEBUG LEVEL 1: Connected to Database");
+                    if(global.DEBUG_FLAG) {
+                        console.log("DEBUG: Connected to Database");
                     }
                     resolve(connection);
                 }               
