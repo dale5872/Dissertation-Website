@@ -14,6 +14,7 @@ const UserProfile = require('./auth/userProfile.js');
 const Registration = require('./auth/registration.js');
 const UserInformation = require('./auth/userInformation.js');
 const UploadFile = require('./analysis/uploadfile.js');
+const FetchImports = require('./auth/fetchImports.js');
 
 global.DEBUG_FLAG = true;
 //-----------------------------------------------
@@ -48,7 +49,7 @@ app.use(express.urlencoded({
 app.use(bodyParser.urlencoded({extended : true}));
 app.use(bodyParser.json());
 
-const whitelist = ['http://localhost:4200', 'http://127.0.0.1:4200', 'http://51.11.10.177:4200'];
+const whitelist = ['http://localhost:4200', 'http://127.0.0.1:4200', 'http://51.11.10.177:4200', 'http://81.101.204.147'];
 var corsOptions = {
     origin: function (origin, callback) {
         if (whitelist.indexOf(origin) !== -1) {
@@ -193,6 +194,43 @@ app.post('/api/uploadfile', multipartMiddleware, (req, res) => {
     } else {
         if(global.DEBUG_FLAG) {
             console.log(`DEBUG: UserID was not present in cookie. Aborting File Upload`);
+        }
+        res.status(401).send("User not Authorized");
+        // @todo: delete the file again
+    }
+});
+
+app.route('/api/fetchimports').get((req, res) => {
+    if(req.session.userID) {
+        if(global.DEBUG_FLAG) {
+            console.log(`DEBUG: Fetching Imports for user: ${req.session.sessionID}`);
+        }
+
+        var userinfo = new UserInformation(req.session.userID);
+        userinfo.retrieve().then((profile) => {
+            var fetchImports = new FetchImports(req.session.userID);
+            fetchImports.fetch().then((dataObject) => {
+                var responseObject = {
+                    userProfile: profile,
+                    dataObject: dataObject
+                };
+
+                if(global.DEBUG_FLAG) {
+                    console.log(`DEBUG: Imports Retrieved`);
+                }
+                
+                console.log(responseObject);
+                res.send(responseObject);
+            }).catch((error) => {
+                res.status(400).send(error.message);
+            });
+        }).catch((error) => {
+            res.status(400).send(error.message);
+        });
+
+    } else {
+        if(global.DEBUG_FLAG) {
+            console.log(`DEBUG: UserID was not present in cookie. Aborting...`);
         }
         res.status(401).send("User not Authorized");
         // @todo: delete the file again

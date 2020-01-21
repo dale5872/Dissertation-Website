@@ -4,6 +4,7 @@ import { Routes, RouterModule } from '@angular/router';
 import { AuthGuard } from '../_guards/auth.guard';
 import { DashboardComponent } from './dashboard.component';
 import { UploadfileComponent } from './uploadfile/uploadfile.component';
+import { ViewuploadsComponent } from './viewuploads/viewuploads.component';
 
 
 
@@ -16,6 +17,10 @@ const routes: Routes = [
       {
         path: 'uploadfile',
         component: UploadfileComponent
+      },
+      {
+        path: 'viewuploads',
+        component: ViewuploadsComponent
       }
     ]
   }

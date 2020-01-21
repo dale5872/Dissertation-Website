@@ -16,7 +16,8 @@ class Connector {
             server: "feedback-hub.database.windows.net",
             options: {
                 database: "FeedbackHub",
-                encrypt: true
+                encrypt: true,
+                rowCollectionOnRequestCompletion: true
             }
         };
         return config;
