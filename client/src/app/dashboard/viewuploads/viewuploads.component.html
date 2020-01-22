@@ -1,3 +1,5 @@
+<router-outlet></router-outlet>
+
 <div class="container col-sm-12 mx-2 my-2">
     <div class="col-sm-12">
         <div *ngFor="let import of imports">
@@ -22,7 +24,11 @@
                             <div class="col-sm-3">
                                 <p class="card-text">Import Type: {{import.importMethod}}</p>
                             </div>
-                            <div class="col-sm-3"></div>
+                            <div class="col-sm-3">
+                                <a class="text-primary" routerLink="viewresponses">View Responses</a>
+                                <br />
+                                <a class="text-danger">Delete Import</a>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -30,3 +36,4 @@
         </div>
     </div>
 </div>
+
