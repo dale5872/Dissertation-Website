@@ -16,6 +16,7 @@ const UserInformation = require('./auth/userInformation.js');
 const UploadFile = require('./analysis/uploadfile.js');
 const Imports = require('./fetch/imports.js');
 const Responses = require('./fetch/responses.js');
+const Questionnaire = require('./fetch/questionnaire.js');
 
 global.DEBUG_FLAG = true;
 //-----------------------------------------------
@@ -242,7 +243,6 @@ app.route('/api/fetch/responses').post((req, res) =>  {
         if(global.DEBUG_FLAG) {
             console.log(`DEBUG: Fetching Responses for user: ${req.session.userID}. Import: ${req.session.importID}`);
         }
-        console.log(req.body.importID);
 
         var userinfo = new UserInformation(req.session.userID);
         var uip = userinfo.retrieve();
@@ -270,6 +270,41 @@ app.route('/api/fetch/responses').post((req, res) =>  {
         }
         res.status(401).send("User not authorized");
     }
+});
+
+app.route('/api/fetch/questionnaire').post((req, res) => {
+    if(req.session.userID) {
+        if(global.DEBUG_FLAG) {
+            console.log(`DEBUG: Fetching Responses for user: ${req.session.userID}. Import: ${req.session.importID}`);
+        }
+
+        var userinfo = new UserInformation(req.session.userID);
+        var uip = userinfo.retrieve();
+
+        var fetchQuestionnaire = new Questionnaire(req.body.questionnaireID);
+        var fq = fetchQuestionnaire.fetch();
+
+        Promise.all([uip, fq]).then(vals => {
+            if(global.DEBUG_FLAG) {
+                console.log(`DEBUG: Responses fetched. Sending to client...`);
+            }
+
+            var responseObject = {
+                userProfile: vals[0],
+                dataObject: vals[1]
+            }
+
+            res.send(responseObject);
+        }).catch((error) => {
+            res.status(500).send(error.message);
+        });
+    } else {
+        if(global.DEBUG_FLAG) {
+            console.log(`DEBUG: UserID was not present in cookie. Aborting...`);
+        }
+        res.status(401).send("User not authorized");
+    }
+
 });
 
 app.listen(3000);

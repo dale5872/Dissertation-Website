@@ -3,13 +3,13 @@
 <div class="container col-sm-12 mx-2 my-2" style="height:94%">
     <div class="col-sm-12">
         <div *ngFor="let import of imports">
-            <div class="row">
+            <div class="row mb-2">
                 <div class="card col-sm-12">
                     <div class="card-body">
                         <div class="row">
                             <h5 class="card-title">
                                 {{import.filename}}
-                                <h6 class="card-subtitle text-success">
+                                <h6 class="card-subtitle" [ngClass]="{'text-success': import.status=='Complete' || import.status =='Imported', 'text-warning': import.status=='Importing' || import.status=='Analysing', 'text-danger': import.status=='Failed'}">
                                     {{import.status}}
                                 </h6>
                             </h5>
@@ -30,9 +30,17 @@
                                 </div>
                             </div>
                             <div class="col-sm-3">
-                                <a class="text-primary" routerLink="viewresponses/{{import.importID}}">View Responses</a>
+                                <div class="row">
+                                    <a class="text-primary" routerLink="viewresponses/{{import.importID}}/{{import.questionnaireID}}">View Responses</a>
+                                </div>
+                                <div class="row" *ngIf="import.status=='Complete'">
+                                    <a class="text-primary">View Analysis</a>
+                                </div>
+                                <div class="row">
+                                    <a class="text-danger">Delete Import</a>
+                                </div>
                                 <br />
-                                <a class="text-danger">Delete Import</a>
+
                             </div>
                         </div>
                     </div>
