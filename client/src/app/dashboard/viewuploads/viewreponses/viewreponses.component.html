@@ -1,4 +1,4 @@
-<div class="container bg-white col-sm-12 mx-2 my-2" style="position:fixed; z-index:200; height: 100%;">
+<div class="container bg-white col-sm-9 mx-2 my-2" style="position:fixed; z-index:200; height: 94%; overflow-y: scroll;">
     <div class="row">
         <div class="col-sm-3">
             <a class="text-primary" routerLink="../">Back</a>
@@ -9,20 +9,22 @@
     </div>
 
     <div class="row">
-        <table class="table">
-            <thead>
-
-            </thead>
-            <tbody>
-                <div *ngFor="let response of tableData">
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
                     <tr>
+                        <th scope="col">Response ID</th>
+                        <th scope="col">Raw_Data</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let response of tableData" [ngClass]="{'table-danger': response.raw_data == ''}">
                         <td>{{response.responseID}}</td>
                         <td>{{response.raw_data}}</td>
                     </tr>
-                </div>
-            </tbody>
-        </table>
+                </tbody>
+            </table>
+        </div>
     </div>
-
 </div>
 

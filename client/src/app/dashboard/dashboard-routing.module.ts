@@ -26,7 +26,7 @@ const routes: Routes = [
         canActivate: [AuthGuard],
         children: [
           {
-            path: 'viewresponses',
+            path: 'viewresponses/:importid',
             component: ViewreponsesComponent,
             canActivate: [AuthGuard]
           }

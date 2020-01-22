@@ -219,8 +219,7 @@ app.route('/api/fetchimports').get((req, res) => {
                 if(global.DEBUG_FLAG) {
                     console.log(`DEBUG: Imports Retrieved`);
                 }
-                
-                console.log(responseObject);
+                console.log(responseObject.dataObject);
                 res.send(responseObject);
             }).catch((error) => {
                 res.status(400).send(error.message);
@@ -238,16 +237,17 @@ app.route('/api/fetchimports').get((req, res) => {
     }
 });
 
-app.route('/api/fetch/responses').get((req, res) =>  {
+app.route('/api/fetch/responses').post((req, res) =>  {
     if(req.session.userID) {
         if(global.DEBUG_FLAG) {
             console.log(`DEBUG: Fetching Responses for user: ${req.session.userID}. Import: ${req.session.importID}`);
         }
+        console.log(req.body.importID);
 
         var userinfo = new UserInformation(req.session.userID);
         var uip = userinfo.retrieve();
 
-        var fetchResponses = new Responses(req.session.importID);
+        var fetchResponses = new Responses(req.body.importID);
         var frp = fetchResponses.fetch();
 
         Promise.all([uip, frp]).then(vals => {

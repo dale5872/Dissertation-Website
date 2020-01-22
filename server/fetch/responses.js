@@ -36,11 +36,11 @@ class Responses {
                         console.log(rows);
                         console.log(rowCount);
                         
-                        dataObject.imports = [];
+                        dataObject.responses = [];
 
                         //create the output object with the expected fields
                         rows.forEach(column => {
-                            dataObject.imports.push(
+                            dataObject.responses.push(
                                 {
                                     responseID: column[0].value,
                                     raw_data: column[1].value
@@ -48,6 +48,7 @@ class Responses {
                             )
                         });
 
+                        console.log(dataObject);
                         resolve(dataObject);
                     } else {
                         if(global.DEBUG_FLAG) {

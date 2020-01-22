@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpService } from 'src/app/_service/http.service';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-viewreponses',
@@ -9,13 +10,20 @@ import { HttpService } from 'src/app/_service/http.service';
 export class ViewreponsesComponent implements OnInit {
 
   tableData = [];
+  importID: number;
 
   constructor(
-    private http: HttpService
+    private http: HttpService,
+    private activatedRoute: ActivatedRoute
   ) { }
 
   async ngOnInit() {
-    this.tableData = await this.http.get('api/fetch/responses');
+    this.activatedRoute.params.subscribe(params => {
+      this.importID = params['importid'];
+    });
+
+    let responseData = await this.http.post('api/fetch/responses', {importID : this.importID});
+    this.tableData = responseData.responses;
   }
 
 }

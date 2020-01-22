@@ -23,9 +23,9 @@ class Imports {
                 console.log("DEBUG: Fetching Imports from Database");
             }
 
-            var request = new Request(`SELECT i.import_Date, i.import_method, i.status, i.filename, i.responses
+            var request = new Request(`SELECT i.import_Date, i.import_method, i.status, i.filename, i.responses, i.import_ID
             FROM feedbackhub.import AS i
-            WHERE i.user_ID = 47`, (err, rowCount, rows) => {
+            WHERE i.user_ID = ${obj._userID}`, (err, rowCount, rows) => {
                 if(err) {
                     console.error("ERROR: An SQL Error has occured");
                     console.error(err.message);
@@ -45,11 +45,16 @@ class Imports {
                                     importMethod: column[1].value,
                                     status: column[2].value,
                                     filename: column[3].value,
-                                    responses: column[4].value
+                                    responses: column[4].value,
+                                    importID: column[5].value
                                 }
                             )
                         });
 
+                        if(global.DEBUG_FLAG) {
+                            console.log(dataObject.imports);
+                        }
+            
                         resolve(dataObject);
                     } else {
                         if(global.DEBUG_FLAG) {
