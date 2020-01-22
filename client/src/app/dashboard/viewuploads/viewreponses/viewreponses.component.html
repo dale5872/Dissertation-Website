@@ -1,5 +1,28 @@
 <div class="container bg-white col-sm-12 mx-2 my-2" style="position:fixed; z-index:200; height: 100%;">
-    <p>viewreponses works!</p>
+    <div class="row">
+        <div class="col-sm-3">
+            <a class="text-primary" routerLink="../">Back</a>
+        </div>
+        <div class="col-sm-9">
+            
+        </div>
+    </div>
+
+    <div class="row">
+        <table class="table">
+            <thead>
+
+            </thead>
+            <tbody>
+                <div *ngFor="let response of tableData">
+                    <tr>
+                        <td>{{response.responseID}}</td>
+                        <td>{{response.raw_data}}</td>
+                    </tr>
+                </div>
+            </tbody>
+        </table>
+    </div>
 
 </div>
 

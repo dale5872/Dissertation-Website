@@ -14,7 +14,8 @@ const UserProfile = require('./auth/userProfile.js');
 const Registration = require('./auth/registration.js');
 const UserInformation = require('./auth/userInformation.js');
 const UploadFile = require('./analysis/uploadfile.js');
-const FetchImports = require('./auth/fetchImports.js');
+const Imports = require('./fetch/imports.js');
+const Responses = require('./fetch/responses.js');
 
 global.DEBUG_FLAG = true;
 //-----------------------------------------------
@@ -203,12 +204,12 @@ app.post('/api/uploadfile', multipartMiddleware, (req, res) => {
 app.route('/api/fetchimports').get((req, res) => {
     if(req.session.userID) {
         if(global.DEBUG_FLAG) {
-            console.log(`DEBUG: Fetching Imports for user: ${req.session.sessionID}`);
+            console.log(`DEBUG: Fetching Imports for user: ${req.session.userID}`);
         }
 
         var userinfo = new UserInformation(req.session.userID);
         userinfo.retrieve().then((profile) => {
-            var fetchImports = new FetchImports(req.session.userID);
+            var fetchImports = new Imports(req.session.userID);
             fetchImports.fetch().then((dataObject) => {
                 var responseObject = {
                     userProfile: profile,
@@ -234,6 +235,40 @@ app.route('/api/fetchimports').get((req, res) => {
         }
         res.status(401).send("User not Authorized");
         // @todo: delete the file again
+    }
+});
+
+app.route('/api/fetch/responses').get((req, res) =>  {
+    if(req.session.userID) {
+        if(global.DEBUG_FLAG) {
+            console.log(`DEBUG: Fetching Responses for user: ${req.session.userID}. Import: ${req.session.importID}`);
+        }
+
+        var userinfo = new UserInformation(req.session.userID);
+        var uip = userinfo.retrieve();
+
+        var fetchResponses = new Responses(req.session.importID);
+        var frp = fetchResponses.fetch();
+
+        Promise.all([uip, frp]).then(vals => {
+            if(global.DEBUG_FLAG) {
+                console.log(`DEBUG: Responses fetched. Sending to client...`);
+            }
+
+            var responseObject = {
+                userProfile: vals[0],
+                dataObject: vals[1]
+            }
+
+            res.send(responseObject);
+        }).catch((error) => {
+            res.status(500).send(error.message);
+        });
+    } else {
+        if(global.DEBUG_FLAG) {
+            console.log(`DEBUG: UserID was not present in cookie. Aborting...`);
+        }
+        res.status(401).send("User not authorized");
     }
 });
 

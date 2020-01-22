@@ -1,15 +1,13 @@
 const { Request } = require('tedious');
 const Connector = require('../connections/databaseConnector.js');
 
-class FetchImports {
-    constructor(userID) {
-        this._userID = userID;
+class Responses {
+    constructor(importID) {
+        this._importID = importID;
     }
 
     async fetch() {
-        if(global.DEBUG_FLAG) {
-            console.log("DEBUG: Fetching Imports");
-        }
+        //Initialise database connection
         var connector = new Connector();
 
         let connection = await connector.connect().catch((e) => {
@@ -20,12 +18,14 @@ class FetchImports {
 
         return new Promise((resolve, reject) => {
             if(global.DEBUG_FLAG) {
-                console.log("DEBUG: Fetching Imports from Database");
+                console.log("DEBUG: Fetching Responses from Database");
             }
 
-            var request = new Request(`SELECT i.import_Date, i.import_method, i.status, i.filename, i.responses
-            FROM feedbackhub.import AS i
-            WHERE i.user_ID = 47`, (err, rowCount, rows) => {
+            var request = new Request(`SELECT r.response_ID, e.raw_data
+            FROM (feedbackhub.entity AS e
+                 INNER JOIN feedbackhub.response AS r ON e.response_ID = r.response_ID
+                     INNER JOIN feedbackhub.import AS i ON r.import_ID = i.import_ID)
+            WHERE i.import_ID = ${obj._importID};`, (err, rowCount, rows) => {
                 if(err) {
                     console.error("ERROR: An SQL Error has occured");
                     console.error(err.message);
@@ -38,14 +38,12 @@ class FetchImports {
                         
                         dataObject.imports = [];
 
+                        //create the output object with the expected fields
                         rows.forEach(column => {
                             dataObject.imports.push(
                                 {
-                                    importDate: column[0].value,
-                                    importMethod: column[1].value,
-                                    status: column[2].value,
-                                    filename: column[3].value,
-                                    responses: column[4].value
+                                    responseID: column[0].value,
+                                    raw_data: column[1].value
                                 }
                             )
                         });
@@ -53,17 +51,19 @@ class FetchImports {
                         resolve(dataObject);
                     } else {
                         if(global.DEBUG_FLAG) {
-                            console.log(`DEBUG: No imports to retrieve`);
+                            console.log(`DEBUG: No responses to retrieve`);
                         }
-                        reject("No imports to retrieve");
+                        reject("No responses to retrieve");
     
                     }
                 }
             });
 
             connection.execSql(request);
+
+
         });
     }
 }
 
-module.exports = FetchImports;
+module.exports = Responses;

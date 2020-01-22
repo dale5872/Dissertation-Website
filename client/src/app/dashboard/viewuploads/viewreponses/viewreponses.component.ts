@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { HttpService } from 'src/app/_service/http.service';
 
 @Component({
   selector: 'app-viewreponses',
@@ -7,9 +8,14 @@ import { Component, OnInit } from '@angular/core';
 })
 export class ViewreponsesComponent implements OnInit {
 
-  constructor() { }
+  tableData = [];
 
-  ngOnInit() {
+  constructor(
+    private http: HttpService
+  ) { }
+
+  async ngOnInit() {
+    this.tableData = await this.http.get('api/fetch/responses');
   }
 
 }
