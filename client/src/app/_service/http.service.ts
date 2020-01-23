@@ -70,7 +70,7 @@ export class HttpService {
       responseType: 'text'
     }).subscribe((res: any) => {
       //show status to user
-      this.alertService.showSucccess("File Uploaded Successfully");
+      this.alertService.showSucccess("Importing file. Please go to the 'View Uploaded Responses' section to track progress");
       return res.body;
     }, (error) => {
       //show error to user
