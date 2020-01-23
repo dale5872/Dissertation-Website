@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpService } from 'src/app/_service/http.service';
+import { BootstrapAlertService } from 'ngx-bootstrap-alert-service'
 
 @Component({
   selector: 'app-uploadfile',
@@ -10,7 +11,8 @@ export class UploadfileComponent implements OnInit {
   filename: string;
   selectedFile: File;
   constructor(
-    private http: HttpService
+    private http: HttpService,
+    private alertService: BootstrapAlertService
   ) { 
   }
   
@@ -27,9 +29,7 @@ export class UploadfileComponent implements OnInit {
     try {
       this.http.uploadFile(this.selectedFile, this.filename);
     } catch (error) {
-      // @todo : Do some proper error catching here
-      console.log(error);
-      console.log(error.message);
+      this.alertService.showError(error.message);
     }
   }
 }

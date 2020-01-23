@@ -24,15 +24,18 @@ export class HttpService {
    * @param body Any data to send to the server
    */
   post(url: string, body: Object): any {
-    this.http.post("http://51.11.10.177:3000/" + url, body, {
-      withCredentials: true
-    }).subscribe((res: HttpReturn) => {
-      var userProfile: User = res.userProfile;
-      this.session.setSessionData(userProfile);
+    return new Promise((resolve, reject) => {
+      this.http.post("http://51.11.10.177:3000/" + url, body, {
+        withCredentials: true
+      }).subscribe((res: HttpReturn) => {
+        var userProfile: User = res.userProfile;
+        this.session.setSessionData(userProfile);
+  
+        resolve(res.dataObject);
+      }, (error) => {
+        reject(error.message);
+      });
 
-      return res.dataObject;    
-    }, (error) => {
-      throw new Error(error.message);
     });
   }
 
@@ -67,7 +70,7 @@ export class HttpService {
       responseType: 'text'
     }).subscribe((res: any) => {
       //show status to user
-      this.alertService.showSucccess("File Uploaded Successfully");
+      this.alertService.showSucccess("Importing file. Please go to the 'View Uploaded Responses' section to track progress");
       return res.body;
     }, (error) => {
       //show error to user
