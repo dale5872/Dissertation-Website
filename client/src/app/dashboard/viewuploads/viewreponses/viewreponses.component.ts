@@ -13,6 +13,7 @@ export class ViewreponsesComponent implements OnInit {
   tableData = [];
   questionnaireName: string;
   questionnaireData: Object;
+  headers = [];
   importID: number;
   questionnaireID: number;
 
@@ -31,14 +32,34 @@ export class ViewreponsesComponent implements OnInit {
     let responseData = this.http.post('api/fetch/responses', {importID : this.importID});
 
     Promise.all([questionnaireData, responseData]).then(values => {
-      this.tableData = values[1].responses;
+      var responses = values[1].responses;
       this.questionnaireName = values[0].questionnaireName;
-      this.questionnaireData = values[0].headers;
+      this.headers = values[0].headers;
+
+      this.populateTable(responses);
+      console.log(this.tableData);
+    });
+  }  
+
+    populateTable(responses) {
+      var numOfHeaders = this.headers.length;
+      var numOfResponses = responses.length;
+      var rows = numOfResponses / numOfHeaders;
+
+      console.log(numOfHeaders);
+      console.log(numOfResponses);
+
+      for(var i = 0; i < rows; i++) {
+        var row = {
+          rowData: []
+        };
+
+        for(var c = 0; c < numOfHeaders; c++) {
+          row.rowData.push(responses[(i*numOfHeaders) + c]);
+        }
+        this.tableData.push(row);
+      }
 
       console.log(this.tableData);
-      console.log(this.questionnaireName);
-      console.log(this.questionnaireData);
-    });
-  }
-
+    }
 }
