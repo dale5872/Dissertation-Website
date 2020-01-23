@@ -37,29 +37,30 @@ export class ViewreponsesComponent implements OnInit {
       this.headers = values[0].headers;
 
       this.populateTable(responses);
-      console.log(this.tableData);
     });
   }  
 
-    populateTable(responses) {
-      var numOfHeaders = this.headers.length;
-      var numOfResponses = responses.length;
-      var rows = numOfResponses / numOfHeaders;
+  /**
+   * Function takes all the raw responses, and pivots the table so
+   * we have each response matching the headers instead of a table with each row being
+   * the answer to a single question
+   * @param responses An array of all the responses
+   */
+  populateTable(responses) {
+    var numOfHeaders = this.headers.length;
+    var numOfResponses = responses.length;
+    var rows = numOfResponses / numOfHeaders;
 
-      console.log(numOfHeaders);
-      console.log(numOfResponses);
+    for(var i = 0; i < rows; i++) {
+      var row = {
+        rowData: []
+      };
 
-      for(var i = 0; i < rows; i++) {
-        var row = {
-          rowData: []
-        };
-
-        for(var c = 0; c < numOfHeaders; c++) {
-          row.rowData.push(responses[(i*numOfHeaders) + c]);
-        }
-        this.tableData.push(row);
+      for(var c = 0; c < numOfHeaders; c++) {
+        row.rowData.push(responses[(i*numOfHeaders) + c]);
       }
-
-      console.log(this.tableData);
+      this.tableData.push(row);
     }
+
+  }
 }

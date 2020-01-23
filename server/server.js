@@ -178,7 +178,7 @@ app.post('/api/uploadfile', multipartMiddleware, (req, res) => {
         res.write(`File ${filepath} has been uploaded. Importing into database...`);
 
         //run the python script
-        exec(`python3 '/home/dale/ml/src/data-import.py' --f '${filepath}' --u ${userID} --o ${req.body.filename}`, (err, stdout, stderr) => {
+        exec(`python3 '/home/dale/ml/src/initiator.py' --f '${filepath}' --u ${userID} --o ${req.body.filename}`, (err, stdout, stderr) => {
             if(err) {
                 console.log("ERROR: Could not run Python Script for analysis.");
                 console.log(err.message);
@@ -187,6 +187,7 @@ app.post('/api/uploadfile', multipartMiddleware, (req, res) => {
             if(global.DEBUG_FLAG) {
                 console.log("DEBUG: Logging stdout...");
                 console.log(stdout);
+                console.log(stderr);
             }
         });
 
