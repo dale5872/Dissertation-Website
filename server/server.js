@@ -17,6 +17,7 @@ const UploadFile = require('./analysis/uploadfile.js');
 const Imports = require('./fetch/imports.js');
 const Responses = require('./fetch/responses.js');
 const Questionnaire = require('./fetch/questionnaire.js');
+const Analysis = require('./fetch/analysis.js');
 
 global.DEBUG_FLAG = true;
 //-----------------------------------------------
@@ -282,8 +283,8 @@ app.route('/api/fetch/questionnaire').post((req, res) => {
         var userinfo = new UserInformation(req.session.userID);
         var uip = userinfo.retrieve();
 
-        var fetchQuestionnaire = new Questionnaire(req.body.questionnaireID);
-        var fq = fetchQuestionnaire.fetch();
+        var fetchQuestionnaire = new Questionnaire();
+        var fq = fetchQuestionnaire.fetch(req.body.questionnaireID);
 
         Promise.all([uip, fq]).then(vals => {
             if(global.DEBUG_FLAG) {
@@ -306,6 +307,74 @@ app.route('/api/fetch/questionnaire').post((req, res) => {
         res.status(401).send("User not authorized");
     }
 
+});
+
+app.route('/api/fetch/analysis/full').post((req, res) => {
+    if(req.session.userID) {
+        if(global.DEBUG_FLAG) {
+            console.log(`DEBUG: Fetching Analysis for user: ${req.session.userID}. Import: ${req.body.importID}`);
+        }
+
+        var userinfo = new UserInformation(req.session.userID);
+        var uip = userinfo.retrieve();
+
+        var analysis = new Analysis(req.body.importID);
+        var ao = analysis.fetchFullAnalysis();
+
+        Promise.all([uip, ao]).then(vals => {
+            if(global.DEBUG_FLAG) {
+                console.log(`DEBUG: Analysis fetched. Sending to client...`);
+            }
+
+            var responseObject = {
+                userProfile: vals[0],
+                dataObject: vals[1]
+            }
+
+
+            res.send(responseObject);
+        }).catch((error) => {
+            res.status(500).send(error.message);
+        });
+    } else {
+        if(global.DEBUG_FLAG) {
+            console.log(`DEBUG: UserID was not present in cookie. Aborting...`);
+        }
+        res.status(401).send("User not authorized");
+    }
+
+});
+
+/**
+ * INSERTS
+ */
+app.route('/api/insert/questionnaire').post((req, res) => {
+    if(req.session.userID) {
+        if(global.DEBUG_FLAG) {
+            console.log(`DEBUG: Creating new questionnaire for user: ${req.session.userID}.`);
+        }
+
+        var userinfo = new UserInformation(req.session.userID);
+        var uip = userinfo.retrieve();
+        
+        var questionnaireData = {
+            name: req.body.questionnaireName,
+            headers: req.body.questionnaireHeaders
+        }
+        var questionnaire = new Questionnaire();
+        var qc = questionnaire.create(questionnaireData);
+
+        Promise.all([uip, qc]).then(vals => {
+            var responseObject = {
+                userProfile: vals[0],
+                dataObject: vals[1]
+            }
+
+            res.send(responseObject);
+        }).catch((error) => {
+            res.status(500).send(error.message);
+        });
+    }
 });
 
 app.listen(3000);

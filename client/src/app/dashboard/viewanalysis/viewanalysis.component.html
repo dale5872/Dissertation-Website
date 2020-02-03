@@ -2,33 +2,34 @@
 
 <div class="container col-sm-12 mx-2 my-2" style="height: 94%">
     <div *ngFor="let import of imports">
+        <h5>{{import.filename}}</h5>
         <div class="row mb-2">
-            <div class="card col-sm-12">
+            <div class="card col-sm-5 mr-3">
                 <div class="card-body">
                     <div class="row">
                         <h5 class="card-title">
-                            {{import.filename}}
-                            <h6 class="card-subtitle" [ngClass]="{'text-success': import.status=='Complete' || import.status =='Imported', 'text-warning': import.status=='Importing' || import.status=='Analysing', 'text-danger': import.status=='Failed'}">
-                                {{import.status}}
-                            </h6>
+                            Accepted Responses
                         </h5>
                     </div>
                     <div class="row">
-                        <div class="col-sm-3">
-                            <p class="card-text text-danger">Responses: {{import.responses}}</p>
-                        </div>
-                        <div class="col-sm-3">
-                            <p class="card-text">Import Date: {{import.importDate}}</p>
-                        </div>
-                        <div class="col-sm-3">
-                            <div class="row" *ngIf="import.status=='Complete'">
-                                <a class="text-primary" routerLink="view/{{import.importID}}/{{import.questionnaireID}}">View Analysis</a>
-                            </div>
-                            <br />
-
-                        </div>
                     </div>
                 </div>
+            </div>
+
+            <div class="card col-sm-5 ml-3">
+                <div class="card-body">
+                    <div class="row">
+                        <h5 class="card-title">
+                            
+                        </h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-9"></div>
+            <div class="col-sm-3">
+                <a class="text-primary" routerLink="full/{{import.importID}}/{{import.questionnaireID}}">View Full Analysis >></a>
             </div>
         </div>
     </div>

@@ -8,6 +8,7 @@ import { ViewuploadsComponent } from './viewuploads/viewuploads.component';
 import { ViewreponsesComponent } from './viewuploads/viewreponses/viewreponses.component';
 import { ViewanalysisComponent } from './viewanalysis/viewanalysis.component';
 import { ViewComponent } from './viewanalysis/view/view.component';
+import { FullComponent } from './viewanalysis/full/full.component';
 
 
 
@@ -42,6 +43,11 @@ const routes: Routes = [
           {
             path: 'view/:importid/:questionnaireid',
             component: ViewComponent,
+            canActivate: [AuthGuard]
+          },
+          {
+            path: 'full/:importid/:questionnaireid',
+            component: FullComponent,
             canActivate: [AuthGuard]
           }
         ]
