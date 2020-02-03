@@ -326,13 +326,11 @@ app.route('/api/fetch/analysis/full').post((req, res) => {
             if(global.DEBUG_FLAG) {
                 console.log(`DEBUG: Analysis fetched. Sending to client...`);
             }
-
             var responseObject = {
                 userProfile: vals[0],
                 dataObject: vals[1]
             }
-
-
+            
             res.send(responseObject);
         }).catch((error) => {
             res.status(500).send(error.message);

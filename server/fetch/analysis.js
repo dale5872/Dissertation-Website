@@ -20,11 +20,12 @@ class Analysis {
         const obj = this;
 
         return new Promise((resolve, reject) => {
-            var request = new Request(`SELECT e.raw_data, c.classification
-            FROM (((feedbackhub.entity AS e
+            var request = new Request(`SELECT e.raw_data, c.classification, qh.header_name
+            FROM ((((feedbackhub.entity AS e
                 INNER JOIN feedbackhub.classifications AS C ON e.entity_ID = c.entity_ID)
                  INNER JOIN feedbackhub.response AS r ON e.response_ID = r.response_ID)
                     INNER JOIN feedbackhub.import AS i ON r.import_ID = i.import_ID)
+                        INNER JOIN feedbackhub.questionnaire_headers AS qh ON e.questionnaire_header_ID = qh.header_ID)
             WHERE i.import_ID = ${obj._importID}`, (err, rowCount, rows) => {
                 if(err) {
                     //Error occured
@@ -41,7 +42,8 @@ class Analysis {
                             dataObject.imports.push(
                                 {
                                     rawData: column[0].value,
-                                    classification: column[1].value
+                                    classification: column[1].value,
+                                    rowHeader: column[2].value
                                 }
                             )
                         });

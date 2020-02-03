@@ -18,7 +18,7 @@
                 </thead>
                 <tbody>
                     <tr *ngFor="let response of tableData">
-                        <td *ngFor="let col of response.rowData" [ngClass]="{'table-danger': col.classification == 0, 'table-success': col.classification == 1}">{{col.raw_data}}</td>
+                        <td *ngFor="let col of response.rowData" [ngClass]="{'table-danger': col.classification == 0, 'table-success': col.classification == 1}">{{col.rawData}}</td>
                     </tr>
                 </tbody>
             </table>
