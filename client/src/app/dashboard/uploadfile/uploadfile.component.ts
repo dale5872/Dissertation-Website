@@ -25,9 +25,15 @@ export class UploadfileComponent implements OnInit {
     this.filename = this.selectedFile.name;
   }
 
-  upload() {
+  async upload() {
     try {
-      this.http.uploadFile(this.selectedFile, this.filename);
+      var questionnaireData = {
+        questionnaireName: 'SSC',
+        questionnaireHeaders: ['Stop', 'Start', 'Continue']
+      }
+      var questionnaireID = await this.http.post('api/insert/questionnaire', {questionnaireData: JSON.stringify(questionnaireData)});
+      console.log(questionnaireID.value);
+      this.http.uploadFile(this.selectedFile, this.filename, questionnaireID.value);
     } catch (error) {
       this.alertService.showError(error.message);
     }

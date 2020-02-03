@@ -171,6 +171,7 @@ app.post('/api/uploadfile', multipartMiddleware, (req, res) => {
     if(req.session.userID) {
         var userID = req.session.userID;
         var filepath = req.files.file.path;
+
         if(global.DEBUG_FLAG) {
             console.log(`DEBUG: Uploading file from ${userID}. Storing in ${filepath}`);
             console.log(req.files);
@@ -179,7 +180,7 @@ app.post('/api/uploadfile', multipartMiddleware, (req, res) => {
         res.write(`File ${filepath} has been uploaded. Importing into database...`);
 
         //run the python script
-        exec(`python3 '/home/dale/ml/src/initiator.py' --f '${filepath}' --u ${userID} --o ${req.body.filename}`, (err, stdout, stderr) => {
+        exec(`python3 '/home/dale/ml/src/initiator.py' --f '${filepath}' --u ${userID} --o ${req.body.filename} --q ${req.body.questionnaireID}`, (err, stdout, stderr) => {
             if(err) {
                 console.log("ERROR: Could not run Python Script for analysis.");
                 console.log(err.message);
@@ -357,10 +358,8 @@ app.route('/api/insert/questionnaire').post((req, res) => {
         var userinfo = new UserInformation(req.session.userID);
         var uip = userinfo.retrieve();
         
-        var questionnaireData = {
-            name: req.body.questionnaireName,
-            headers: req.body.questionnaireHeaders
-        }
+        var questionnaireData = JSON.parse(req.body.questionnaireData);
+        
         var questionnaire = new Questionnaire();
         var qc = questionnaire.create(questionnaireData);
 

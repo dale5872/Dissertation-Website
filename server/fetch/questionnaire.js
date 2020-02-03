@@ -1,5 +1,6 @@
 const { Request } = require('tedious');
 const Connector = require('../connections/databaseConnector.js');
+var TYPES = require('tedious').TYPES
 
 class Questionnaire {
     constructor() {
@@ -93,40 +94,102 @@ class Questionnaire {
         
         return new Promise((resolve, reject) => {
             //Create new questionnaire
-            var insert_questionnaire_request = new Request(`INSERT INTO feedbackhub.questionnaire
-            (questionnaire_name) VALUES (${questionnaireData.questionnaireName}); SELECT CAST(@@IDENTITY AS INT);`, (err, rowCount, rows) => {
-                if(err) {
-                    console.error("ERROR: An SQL Error has occured");
-                    console.error(err.message);
+
+            //begin transaction
+            connection.beginTransaction((begin_T_err) => {
+                if(begin_T_err) {
+                    console.error("ERROR: An SQL Error has occured. questionnaire.js:98");
+                    console.error(begin_T_err);
                     reject("An unknown error has occured. Contact an administrator for help");
+
                 } else {
-                    var questionnaireID;
 
-                    //grab the questionnaire id
-                    if(rowCount > 0) {
-                        questionnaireID = row[0][0];
-                        console.log(questionnaireID);
-                    }
+                    //insert questionnaire request
+                    var insert_questionnaire_request = new Request(`INSERT INTO feedbackhub.questionnaire (questionnaire_name) VALUES ('${questionnaireData.questionnaireName}');`, (insert_QR_err, rowCount, rows) => {
+                        if(insert_QR_err) {
+                            console.error("ERROR: An SQL Error has occured. questionnaire.js:106");
+                            console.error(insert_QR_err);
+                            connection.rollbackTransaction((rollback_T_err) => {
+                                if(rollback_T_err) {
+                                    console.log(rollback_T_err);
+                                }
+                                reject();
+                            });
+                            reject("An unknown error has occured. Contact an administrator for help");
+                        } else {                            
+                            //we need to get the last insert id
+                            var get_questionnaire_id = new Request(`SELECT CAST(@@IDENTITY AS INT)`, (sel_QID_err, rowCount, rows) => {
+                                if(sel_QID_err){
+                                    console.error("ERROR: An SQL Error has occured. questionnaire.js:121");
+                                    console.error(insert_QR_err);
+                                    connection.rollbackTransaction((rollback_T_err) => {
+                                        if(rollback_T_err) {
+                                            console.log(rollback_T_err);
+                                        }
+                                        reject();
+                                    });
+                                    reject("An unknown error has occured. Contact an administrator for help");         
+                                } else {
+                                    //grab the questionnaire id
+                                    var questionnaireID = rows[0][0];
 
-                    //for each header, insert into the database
-                    questionnaireData.headers.forEach((header) => {
-                        var insert_questionnaireHeaders_request = new Request(`INSERT INTO
-                        feedbackhub.questionnaire_headers (header_name, questionnaire_ID) VALUES (${header}, ${questionnaireID})`, (err) => {
-                            if(err) {
-                                console.error("ERROR: An SQL Error has occured");
-                                console.error(err.message);
-                                reject("An unknown error has occured. Contact an administrator for help");
-                            }
-                        });
+                                    //now insert entities
+                                    //for each header, insert into the database
+                                    //we're going to use a BulkLoad here
+                                    
+                                    var bulkLoad = connection.newBulkLoad('feedbackhub.questionnaire_headers', {keepNulls: true}, (blk_err, rowCount) => {
+                                        if(blk_err) {
+                                            console.error("ERROR: An SQL Error has occured. questionnaire.js:141");
+                                            console.error(blk_err);
+                                            connection.rollbackTransaction((rollback_T_err) => {
+                                                if(rollback_T_err) {
+                                                    console.log(rollback_T_err);
+                                                }
+                                                reject();
+                                            });
+                                            reject("An unknown error has occured. Contact an administrator for help");
+                                        } else {
+                                            if(global.DEBUG_FLAG) {
+                                                console.log(`DEBUG: Inserted ${rowCount} headers`);
+                                            }
 
-                        connection.execSql(insert_questionnaireHeaders_request);
+                                            //commit transaction
+                                            connection.commitTransaction((end_T_err) => {
+                                                if(end_T_err) {
+                                                    console.error("ERROR: An SQL Error has occured. questionnaire.js:162");
+                                                    console.error(end_T_err);
+                                                    reject("An unknown error has occured. Contact an administrator for help");
+                                                } else {
+                                                    //we have succeeded
+                                                    resolve(questionnaireID);
+                                                }
+                                            });
+
+                                        }
+                                    });
+
+                                    bulkLoad.addColumn('header_name', TYPES.VarChar, {nullable: false});
+                                    bulkLoad.addColumn('questionnaire_ID', TYPES.Int, {nullable: false});
+
+                                    questionnaireData.questionnaireHeaders.forEach((header) => {
+                                        bulkLoad.addRow({ header_ID: null, header_name: header, questionnaire_ID: questionnaireID.value});
+                                        console.log(`QUESIONNAIRE ID: ${questionnaireID.value}`);
+                                    });                                    
+                                    
+                                    connection.execBulkLoad(bulkLoad);
+                                }
+                            });
+                            //fetch insert id
+                            connection.execSql(get_questionnaire_id);
+
+                        }
                     });
-                    resolve(questionnaireID);
                 }
+    
+                connection.execSql(insert_questionnaire_request);
             });
-
-            connection.execSql(insert_questionnaire_request);
         });
+
         
     }
 
