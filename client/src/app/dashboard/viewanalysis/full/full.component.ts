@@ -14,7 +14,8 @@ export class FullComponent implements OnInit {
   questionnaireID: number;  
   questionnaireName: String;
   headers = [];
-  tableData = [];
+  tableDataAccepted = [];
+  tableDataRejected = [];
 
   constructor(
     private http: HttpService,
@@ -47,12 +48,16 @@ export class FullComponent implements OnInit {
    * @param responses An array of all the responses
    */
   populateTable(responses) {
+    console.log(responses);
+
     var columns = this.headers.length;
     var numOfResponses = responses.length;
 
-    var data = [];
+    var dataAccepted = [];
+    var dataRejected = [];
     for(var c = 0; c < columns; c++) {
-      data.push([]);
+      dataAccepted.push([]);
+      dataRejected.push([]);
     }
 
     for(var i = 0; i < numOfResponses; i++) {
@@ -60,21 +65,30 @@ export class FullComponent implements OnInit {
       var header: String;
       for(var h = 0; h < columns; h++) {
         if(this.headers[h] === responses[i]['rowHeader']) {
-          data[h].push(responses[i]);
+          if(responses[i]['classification'] === 0) {
+            dataRejected[h].push(responses[i]);
+          } else {
+            dataAccepted[h].push(responses[i]);
+          }
         }
       }
     }
 
+    this.tableDataAccepted = this.pivotTable(dataAccepted, columns);
+    this.tableDataRejected = this.pivotTable(dataRejected, columns);
+  }
+
+  pivotTable(data, columns) {
     //now we need to pivot the table
     //find the longest column
     var longestColumn = 0;
+    var table = []
+
     for(var i = 0; i < columns; i++) {
       if(data[i].length > longestColumn) {
         longestColumn = data[i].length;
       }
     }
-
-    console.log(data);
 
     for(var i = 0; i < longestColumn; i++) {
       var row = {
@@ -89,9 +103,9 @@ export class FullComponent implements OnInit {
         }
       }
 
-      this.tableData.push(row);
+      table.push(row);
     }
 
-    console.log(this.tableData);
+    return table;
   }
 }

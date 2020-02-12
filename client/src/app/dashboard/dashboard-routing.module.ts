@@ -9,6 +9,7 @@ import { ViewreponsesComponent } from './viewuploads/viewreponses/viewreponses.c
 import { ViewanalysisComponent } from './viewanalysis/viewanalysis.component';
 import { ViewComponent } from './viewanalysis/view/view.component';
 import { FullComponent } from './viewanalysis/full/full.component';
+import { DashboardContentComponent } from './dashboard-content/dashboard-content.component';
 
 
 
@@ -18,6 +19,11 @@ const routes: Routes = [
     component: DashboardComponent,
     canActivate: [AuthGuard],
     children: [
+      {
+        path: '',
+        component: DashboardContentComponent,
+        canActivate: [AuthGuard],
+      },
       {
         path: 'uploadfile',
         component: UploadfileComponent,

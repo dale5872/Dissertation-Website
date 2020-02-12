@@ -1,0 +1,19 @@
+.button-white:hover {
+    background-color: #E7E8E9;
+}
+
+
+.button-white {
+    padding:3%;
+    height:100%;
+    width:100%;
+}
+
+td {
+    padding:0;
+    margin:0;
+}
+
+.tooltip{
+    opacity:1!important;
+  }

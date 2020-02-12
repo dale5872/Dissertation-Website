@@ -10,6 +10,7 @@
 
     <div class="row">
         <div class="table-responsive">
+            <h3 class="text-success">Accepted Responses</h3>
             <table class="table">
                 <thead>
                     <tr>
@@ -17,8 +18,41 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr *ngFor="let response of tableData">
-                        <td *ngFor="let col of response.rowData" [ngClass]="{'table-danger': col.classification == 0, 'table-success': col.classification == 1}">{{col.rawData}}</td>
+                    <tr *ngFor="let response of tableDataAccepted">
+                        <td *ngFor="let col of response.rowData">
+                            <ng-template [ngIf]="col.rawData !== undefined">
+                                <!-- TOOLTIP NOT WORKING -->
+                                <ng-template #tooltipContent>Click to change classification!</ng-template>
+                                <button type="button" class="btn button-white" ngbTooltip="Edit notifications" tooltip-trigger tooltip-animation="false"
+                                tooltip-placement="top">
+                                    {{col.rawData}} 
+                                </button>
+                            </ng-template>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="table-responsive">
+            <h3 class="text-danger">Rejected Responses</h3>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col" *ngFor="let header of headers">{{header}}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let response of tableDataRejected">
+                        <td *ngFor="let col of response.rowData">
+                            <ng-template [ngIf]="col.rawData !== undefined">
+                                <button type="button" class="btn button-white" style="width:100%; height:100%;">
+                                    {{col.rawData}} 
+                                </button>
+                            </ng-template>
+                        </td>
                     </tr>
                 </tbody>
             </table>

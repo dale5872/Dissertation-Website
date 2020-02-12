@@ -8,6 +8,8 @@ import { ViewuploadsComponent } from './viewuploads/viewuploads.component';
 import { ViewreponsesComponent } from './viewuploads/viewreponses/viewreponses.component';
 import { ViewanalysisComponent } from './viewanalysis/viewanalysis.component';
 import { ViewComponent } from './viewanalysis/view/view.component';
+import { FullComponent } from './viewanalysis/full/full.component';
+import { DashboardContentComponent } from './dashboard-content/dashboard-content.component';
 
 
 @NgModule({
@@ -17,7 +19,9 @@ import { ViewComponent } from './viewanalysis/view/view.component';
     ViewuploadsComponent,
     ViewreponsesComponent,
     ViewanalysisComponent,
-    ViewComponent
+    ViewComponent,
+    FullComponent,
+    DashboardContentComponent
   ],
   imports: [
     CommonModule,
