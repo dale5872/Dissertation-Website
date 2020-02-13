@@ -20,7 +20,7 @@ class Analysis {
         const obj = this;
 
         return new Promise((resolve, reject) => {
-            var request = new Request(`SELECT e.raw_data, c.classification, qh.header_name
+            var request = new Request(`SELECT e.entity_id, e.raw_data, c.classification, qh.header_name, c.classification_changed
             FROM ((((feedbackhub.entity AS e
                 INNER JOIN feedbackhub.classifications AS C ON e.entity_ID = c.entity_ID)
                  INNER JOIN feedbackhub.response AS r ON e.response_ID = r.response_ID)
@@ -41,9 +41,11 @@ class Analysis {
                         rows.forEach(column => {
                             dataObject.imports.push(
                                 {
-                                    rawData: column[0].value,
-                                    classification: column[1].value,
-                                    rowHeader: column[2].value
+                                    entity_id: column[0].value,
+                                    rawData: column[1].value,
+                                    classification: column[2].value,
+                                    rowHeader: column[3].value,
+                                    classification_changed: column[4].value
                                 }
                             )
                         });

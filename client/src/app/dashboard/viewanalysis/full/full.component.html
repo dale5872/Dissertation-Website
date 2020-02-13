@@ -19,14 +19,9 @@
                 </thead>
                 <tbody>
                     <tr *ngFor="let response of tableDataAccepted">
-                        <td *ngFor="let col of response.rowData">
+                        <td *ngFor="let col of response.rowData" [ngClass]="{'bg-success': col.classification_changed==1}" (click)="openModal(changeClassification, col.entity_id, col.classification)">
                             <ng-template [ngIf]="col.rawData !== undefined">
-                                <!-- TOOLTIP NOT WORKING -->
-                                <ng-template #tooltipContent>Click to change classification!</ng-template>
-                                <button type="button" class="btn button-white" ngbTooltip="Edit notifications" tooltip-trigger tooltip-animation="false"
-                                tooltip-placement="top">
                                     {{col.rawData}} 
-                                </button>
                             </ng-template>
                         </td>
                     </tr>
@@ -46,11 +41,9 @@
                 </thead>
                 <tbody>
                     <tr *ngFor="let response of tableDataRejected">
-                        <td *ngFor="let col of response.rowData">
+                        <td *ngFor="let col of response.rowData" [ngClass]="{'bg-danger': col.classification_changed==1}" (click)="openModal(changeClassification, col.entity_id, col.classification)">
                             <ng-template [ngIf]="col.rawData !== undefined">
-                                <button type="button" class="btn button-white" style="width:100%; height:100%;">
-                                    {{col.rawData}} 
-                                </button>
+                                {{col.rawData}} 
                             </ng-template>
                         </td>
                     </tr>
@@ -59,3 +52,39 @@
         </div>
     </div>
 </div>
+
+<ng-template #content let-modal>
+    <div class="modal-header">
+        <h4 class="modal-title">Entity Options</h4>
+    </div>
+    <div class="modal-body"> 
+        <div class="row mt-0 mb-3">
+            <small>Click any of the buttons to make changes to the entity</small>
+        </div>
+
+        <div class="row mt-0 mb-3">
+            <button type="button" class="btn btn-primary" (click)="openModal(changeClassification)">Change Classification</button>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-danger" (click)="modal.close()">Close</button>
+    </div>
+</ng-template>
+
+
+<ng-template #changeClassification let-modal>
+    <div class="modal-header">
+        <h4 class="modal-title">Are You Sure?</h4>
+    </div>
+    <div class="modal-body"> 
+        <div class="row mt-0 mb-3">
+            <small>Are you sure you want to change the classification of entity 
+                '{{currentEntity}}'?</small>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-primary" (click)="changeClassification()">Yes</button>
+        <button type="button" class="btn btn-danger" (click)="modal.close()">No</button>
+    </div>
+</ng-template>
+

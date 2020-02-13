@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { HttpService } from 'src/app/_service/http.service';
 import { ActivatedRoute } from '@angular/router';
 import { compileInjectable, ThrowStmt } from '@angular/compiler';
+import {NgbModal, ModalDismissReasons} from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'app-full',
@@ -16,10 +17,12 @@ export class FullComponent implements OnInit {
   headers = [];
   tableDataAccepted = [];
   tableDataRejected = [];
+  currentEntity;
 
   constructor(
     private http: HttpService,
-    private activatedRoute: ActivatedRoute
+    private activatedRoute: ActivatedRoute,
+    private modalService: NgbModal
   ) { }
 
   ngOnInit() {
@@ -107,5 +110,42 @@ export class FullComponent implements OnInit {
     }
 
     return table;
+  }
+
+  changeClassification() {
+
+  }
+
+  async findRawData(entityID: number, currentClassification: number) {
+    return new Promise((resolve, reject) => {
+      console.log(this.tableDataAccepted);
+      if(currentClassification == 1) {
+        //accepted Table
+          this.tableDataAccepted.forEach((row) => {
+            row.rowData.forEach((entity) => {
+              if(entity['entity_id'] === entityID) {
+                resolve(entity['rawData']);
+              }
+            })
+          });
+      } else {
+        //rejected table
+        this.tableDataRejected.forEach((row) => {
+          row.rowData.forEach((entity) => {
+            if(entity['entity_id'] === entityID) {
+              resolve(entity['rawData']);
+            }
+          });
+        });
+      }
+
+      reject();
+    });
+  }
+
+  /** HTML Controls */
+  async openModal(content, entityID: number, currentClassification: number) {
+    this.currentEntity = await this.findRawData(entityID, currentClassification);
+    this.modalService.open(content, {ariaLabelledBy: 'modal-entity-options'});
   }
 }
