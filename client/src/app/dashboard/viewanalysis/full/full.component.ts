@@ -160,4 +160,8 @@ export class FullComponent implements OnInit {
     this.currentEntity = await this.findRawData(entityID, currentClassification);
     this.modalService.open(content, {ariaLabelledBy: 'modal-entity-options'});
   }
+
+  openHelpModal(modal) {
+    this.modalService.open(modal, {ariaLabelledBy: 'modal-help'});
+  }
 }

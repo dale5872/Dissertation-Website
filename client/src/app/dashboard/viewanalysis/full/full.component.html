@@ -1,7 +1,8 @@
 <div class="container bg-white col-sm-9 mx-2 my-2" style="position:fixed; z-index:200; height: 94%; overflow-y: scroll;">
     <div class="row">
         <div class="col-sm-3">
-            <a class="text-primary" routerLink="/dashboard/viewanalysis">Back</a>
+            <button type="button" class="btn btn-secondary" routerLink="/dashboard/viewanalysis">Back</button>
+            <button type="button" class="btn btn-success" (click)="openHelpModal(help)">Help</button>
         </div>
         <div class="col-sm-9">
             
@@ -88,3 +89,26 @@
     </div>
 </ng-template>
 
+<ng-template #help let-modal>
+    <div class="modal-header">
+        <h4 class="modal-title">Help</h4>
+    </div>
+    <div class="modal-body"> 
+        <div class="row px-3 pt-2">
+            <p>
+                This page allows you to see the classification for each entity in the questionnaire. Any
+                empty entities are omitted and not analysed.
+            </p>
+
+            <p>
+                If a classification is incorrect, then clicking on the entity prompts you if you would like
+                to change the classification (from Accepted to Rejected and vice versa). Once a classification has
+                changed, it will automatically move to the correct table and be highlighted in green (for 
+                Rejected -> Accepted classfications) or red. 
+            </p>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-danger" (click)="modal.close()">Close</button>
+    </div>
+</ng-template>
