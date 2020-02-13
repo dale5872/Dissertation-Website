@@ -18,6 +18,7 @@ const Imports = require('./fetch/imports.js');
 const Responses = require('./fetch/responses.js');
 const Questionnaire = require('./fetch/questionnaire.js');
 const Analysis = require('./fetch/analysis.js');
+const Classification = require('./update/classification.js');
 
 global.DEBUG_FLAG = true;
 //-----------------------------------------------
@@ -367,6 +368,35 @@ app.route('/api/insert/questionnaire').post((req, res) => {
                 dataObject: vals[1]
             }
 
+            res.send(responseObject);
+        }).catch((error) => {
+            res.status(500).send(error.message);
+        });
+    }
+});
+
+/** 
+ * UPDATES
+ */
+app.route('/api/update/classification').post((req, res) => {
+    if(req.session.userID) {
+        if(global.DEBUG_FLAG) {
+            console.log(`DEBUG: Updating Classification for entity: ${req.body.entityID}.`);
+        }
+
+        var userinfo = new UserInformation(req.session.userID);
+        var uip = userinfo.retrieve();
+
+        console.log(req.body.entityID);
+        console.log(req.body.classification);
+        var classificationObj = new Classification(req.body.entityID, req.body.classification);
+        classificationObj.updateClassification();
+        
+        Promise.all([uip, classificationObj]).then((vals) => {
+            var responseObject = {
+                userProfile: vals[0],
+                dataObject: ''
+            }
             res.send(responseObject);
         }).catch((error) => {
             res.status(500).send(error.message);

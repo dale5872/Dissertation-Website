@@ -3,6 +3,7 @@ import { HttpService } from 'src/app/_service/http.service';
 import { ActivatedRoute } from '@angular/router';
 import { compileInjectable, ThrowStmt } from '@angular/compiler';
 import {NgbModal, ModalDismissReasons} from '@ng-bootstrap/ng-bootstrap';
+import { BootstrapAlertService } from 'ngx-bootstrap-alert-service';
 
 @Component({
   selector: 'app-full',
@@ -17,12 +18,16 @@ export class FullComponent implements OnInit {
   headers = [];
   tableDataAccepted = [];
   tableDataRejected = [];
+
   currentEntity;
+  currentEntityID: number;
+  currentEntityClassification: number;
 
   constructor(
     private http: HttpService,
     private activatedRoute: ActivatedRoute,
-    private modalService: NgbModal
+    private modalService: NgbModal,
+    private alertService: BootstrapAlertService
   ) { }
 
   ngOnInit() {
@@ -51,7 +56,6 @@ export class FullComponent implements OnInit {
    * @param responses An array of all the responses
    */
   populateTable(responses) {
-    console.log(responses);
 
     var columns = this.headers.length;
     var numOfResponses = responses.length;
@@ -113,12 +117,18 @@ export class FullComponent implements OnInit {
   }
 
   changeClassification() {
-
+    console.log("Changing classification");
+    var newClassification = this.currentEntityClassification === 0 ? 1 : 0;
+    this.http.post('api/update/classification', {entityID: this.currentEntityID, classification: newClassification}).then(() => {
+      this.alertService.showSucccess("Successfully changed classification");
+      this.ngOnInit();
+    }).catch(() => {
+      this.alertService.showError("Failed to change classification");
+    });
   }
 
   async findRawData(entityID: number, currentClassification: number) {
     return new Promise((resolve, reject) => {
-      console.log(this.tableDataAccepted);
       if(currentClassification == 1) {
         //accepted Table
           this.tableDataAccepted.forEach((row) => {
@@ -145,6 +155,8 @@ export class FullComponent implements OnInit {
 
   /** HTML Controls */
   async openModal(content, entityID: number, currentClassification: number) {
+    this.currentEntityID = entityID;
+    this.currentEntityClassification = currentClassification;
     this.currentEntity = await this.findRawData(entityID, currentClassification);
     this.modalService.open(content, {ariaLabelledBy: 'modal-entity-options'});
   }
