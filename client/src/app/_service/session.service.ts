@@ -55,6 +55,8 @@ export class SessionService {
       this._isAuthenticatedSubject.next(true);
       return true;
     }
+    this.logout();
+    
     return false;
   }
 

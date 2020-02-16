@@ -19,8 +19,9 @@ export class ViewanalysisComponent implements OnInit {
   }
 
   async fetchImports() {
-    let jsonImports = await this.http.get('api/fetchimports');
+    let jsonImports = await this.http.get('api/fetch/imports');
     this.imports = jsonImports.imports;
+    console.log(this.imports);
   }
 
 }

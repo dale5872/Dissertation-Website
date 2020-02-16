@@ -23,6 +23,8 @@ export class FullComponent implements OnInit {
   currentEntityID: number;
   currentEntityClassification: number;
 
+  importInformation: any; //Object can be seen in server/imports.js:92
+
   constructor(
     private http: HttpService,
     private activatedRoute: ActivatedRoute,
@@ -38,12 +40,19 @@ export class FullComponent implements OnInit {
 
     let questionnaireData = this.http.post('api/fetch/questionnaire', {questionnaireID: this.questionnaireID});
     let responseData = this.http.post('api/fetch/analysis/full', {importID : this.importID});
+    let importData = this.http.post('api/fetch/single', {importID: this.importID});
 
-    Promise.all([questionnaireData, responseData]).then(values => {
-      var responses = values[1].imports; //unsure why its .imports but it works
+    var promises = [questionnaireData, responseData, importData]
+
+    Promise.all(promises).then(values => {
+      //lets deal with the data as they come in the promises array
       this.questionnaireName = values[0].questionnaireName;
       this.headers = values[0].headers;
-      //console.log(responses);
+
+      var responses = values[1].imports;
+
+      this.importInformation = values[2];
+      console.log(this.importInformation);
       this.populateTable(responses);
     });
 

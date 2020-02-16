@@ -206,7 +206,11 @@ app.post('/api/uploadfile', multipartMiddleware, (req, res) => {
     }
 });
 
-app.route('/api/fetchimports').get((req, res) => {
+/**
+ *  IMPORT ROUTES 
+ */
+
+app.route('/api/fetch/imports').get((req, res) => {
     if(req.session.userID) {
         if(global.DEBUG_FLAG) {
             console.log(`DEBUG: Fetching Imports for user: ${req.session.userID}`);
@@ -214,8 +218,7 @@ app.route('/api/fetchimports').get((req, res) => {
 
         var userinfo = new UserInformation(req.session.userID);
         userinfo.retrieve().then((profile) => {
-            var fetchImports = new Imports(req.session.userID);
-            fetchImports.fetch().then((dataObject) => {
+            Imports.fetch(req.session.userID).then((dataObject) => {
                 var responseObject = {
                     userProfile: profile,
                     dataObject: dataObject
@@ -223,8 +226,8 @@ app.route('/api/fetchimports').get((req, res) => {
 
                 if(global.DEBUG_FLAG) {
                     console.log(`DEBUG: Imports Retrieved`);
+                    console.log(responseObject.dataObject);
                 }
-                console.log(responseObject.dataObject);
                 res.send(responseObject);
             }).catch((error) => {
                 res.status(400).send(error.message);
@@ -242,10 +245,50 @@ app.route('/api/fetchimports').get((req, res) => {
     }
 });
 
+
+app.route('/api/fetch/single').post((req, res) => {
+    if(req.session.userID) {
+        if(global.DEBUG_FLAG) {
+            console.log(`DEBUG: Fetching Import Information for import: ${req.body.importID}`);
+        }
+
+        var userinfo = new UserInformation(req.session.userID);
+        userinfo.retrieve().then((profile) => {
+            Imports.fetchSingle(req.body.importID).then((dataObject) => {
+                var responseObject = {
+                    userProfile: profile,
+                    dataObject: dataObject
+                };
+
+                if(global.DEBUG_FLAG) {
+                    console.log(`DEBUG: Import Information Retrieved`);
+                    console.log(responseObject.dataObject);
+                }
+                res.send(responseObject);
+            }).catch((error) => {
+                console.log(`ERROR: ${error.message}`);
+                res.status(400).send(error.message);
+            });
+        }).catch((error) => {
+            console.log(`ERROR: ${error.message}`);
+            res.status(400).send(error.message);
+        });
+
+    } else {
+        if(global.DEBUG_FLAG) {
+            console.log(`DEBUG: UserID was not present in cookie. Aborting...`);
+        }
+        res.status(401).send("User not Authorized");
+        // @todo: delete the file again
+    }
+
+});
+
+/********************* */
 app.route('/api/fetch/responses').post((req, res) =>  {
     if(req.session.userID) {
         if(global.DEBUG_FLAG) {
-            console.log(`DEBUG: Fetching Responses for user: ${req.session.userID}. Import: ${req.session.importID}`);
+            console.log(`DEBUG: Fetching Responses for user: ${req.session.userID}. Import: ${req.body.importID}`);
         }
 
         var userinfo = new UserInformation(req.session.userID);
@@ -279,7 +322,7 @@ app.route('/api/fetch/responses').post((req, res) =>  {
 app.route('/api/fetch/questionnaire').post((req, res) => {
     if(req.session.userID) {
         if(global.DEBUG_FLAG) {
-            console.log(`DEBUG: Fetching Responses for user: ${req.session.userID}. Import: ${req.session.importID}`);
+            console.log(`DEBUG: Fetching Responses for user: ${req.session.userID}. Import: ${req.body.importID}`);
         }
 
         var userinfo = new UserInformation(req.session.userID);
