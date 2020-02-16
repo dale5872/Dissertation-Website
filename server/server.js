@@ -363,10 +363,9 @@ app.route('/api/fetch/analysis/full').post((req, res) => {
         var userinfo = new UserInformation(req.session.userID);
         var uip = userinfo.retrieve();
 
-        var analysis = new Analysis(req.body.importID);
-        var ao = analysis.fetchFullAnalysis();
+        var analysis = Analysis.fetchFullAnalysis(req.body.importID);
 
-        Promise.all([uip, ao]).then(vals => {
+        Promise.all([uip, analysis]).then(vals => {
             if(global.DEBUG_FLAG) {
                 console.log(`DEBUG: Analysis fetched. Sending to client...`);
             }
@@ -386,6 +385,38 @@ app.route('/api/fetch/analysis/full').post((req, res) => {
         res.status(401).send("User not authorized");
     }
 
+});
+
+app.route('/api/fetch/analysis/similarities').post((req, res) => {
+    if(req.session.userID) {
+        if(global.DEBUG_FLAG) {
+            console.log(`DEBUG: Fetching Analysis Similaritiesx for user: ${req.session.userID}. Import: ${req.body.importID}`);
+        }
+
+        var userinfo = new UserInformation(req.session.userID);
+        var uip = userinfo.retrieve();
+
+        var similarities = Analysis.fetchSimilarities(req.body.importID);
+
+        Promise.all([uip, similarities]).then(vals => {
+            if(global.DEBUG_FLAG) {
+                console.log(`DEBUG: Analysis fetched. Sending to client...`);
+            }
+            var responseObject = {
+                userProfile: vals[0],
+                dataObject: vals[1]
+            }
+            
+            res.send(responseObject);
+        }).catch((error) => {
+            res.status(500).send(error.message);
+        });
+    } else {
+        if(global.DEBUG_FLAG) {
+            console.log(`DEBUG: UserID was not present in cookie. Aborting...`);
+        }
+        res.status(401).send("User not authorized");
+    }
 });
 
 /**

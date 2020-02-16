@@ -24,6 +24,7 @@ export class FullComponent implements OnInit {
   currentEntityClassification: number;
 
   importInformation: any; //Object can be seen in server/imports.js:92
+  similarityData: any; //Object casn be seen in server/analysis.js:91
 
   constructor(
     private http: HttpService,
@@ -41,8 +42,9 @@ export class FullComponent implements OnInit {
     let questionnaireData = this.http.post('api/fetch/questionnaire', {questionnaireID: this.questionnaireID});
     let responseData = this.http.post('api/fetch/analysis/full', {importID : this.importID});
     let importData = this.http.post('api/fetch/single', {importID: this.importID});
+    let similarityData = this.http.post('api/fetch/analysis/similarities', {importID: this.importID});
 
-    var promises = [questionnaireData, responseData, importData]
+    var promises = [questionnaireData, responseData, importData, similarityData];
 
     Promise.all(promises).then(values => {
       //lets deal with the data as they come in the promises array
@@ -52,7 +54,9 @@ export class FullComponent implements OnInit {
       var responses = values[1].imports;
 
       this.importInformation = values[2];
-      console.log(this.importInformation);
+      this.similarityData = values[3].imports;
+      console.log(values);
+
       this.populateTable(responses);
     });
 
