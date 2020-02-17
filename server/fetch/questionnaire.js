@@ -84,6 +84,62 @@ class Questionnaire {
         
     }
 
+    static async getAll(userID) {
+        //Initialise database connection
+        var connector = new Connector();
+
+        let connection = await connector.connect().catch((e) => {
+            throw new Error("Failed to connect to the database");
+        });
+        
+        return new Promise((resolve, reject) => {
+            if(global.DEBUG_FLAG) {
+                console.log("DEBUG: Fetching Questionnaire informatiom from Database");
+            }
+            
+            var dataObject = {
+                questionnaireName: '',
+                headers: []
+            };
+
+            //get the questionnaire data
+            var request = new Request(`SELECT q.questionnaire_ID, q.questionnaire_name
+            FROM (feedbackhub.questionnaire AS q
+                INNER JOIN feedbackhub.user_accounts AS u ON u.user_ID = q.user_ID)
+            WHERE u.user_ID = ${userID};`, (err, rowCount, rows) => {
+                if(err) {
+                    console.error("ERROR: An SQL Error has occured");
+                    console.error(err.message);
+                    reject("An unknown error has occured. Contact an administrator for help");
+                } else {
+                    if(rowCount > 0) {
+                        var dataObject = {};                        
+                        dataObject.imports = [];
+
+                        rows.forEach(column => {
+                            dataObject.imports.push(
+                                {
+                                    questionnaireID: column[0].value,
+                                    questionnaireName: column[1].value
+                                }
+                            )
+                        });
+
+                        //we have all the information, resolve promise
+                        resolve(dataObject);
+                    } else {
+                        if(global.DEBUG_FLAG) {
+                            console.log(`DEBUG: No questionnaires to retrieve`);
+                        }
+                        reject("No questionnaires to retrieve");
+                    }
+                }
+            });
+
+            connection.execSql(request);
+        });        
+    }
+
     static async create(questionnaireData, userID) {
         //Initialise database connection
         var connector = new Connector();

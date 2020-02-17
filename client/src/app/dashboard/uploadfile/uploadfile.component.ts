@@ -14,9 +14,11 @@ export class UploadfileComponent implements OnInit {
   filename: string;
   selectedFile: File; 
   uploadInProgress: boolean = false;
+  userQuestionnaires: any;
   
   uploadFileForm: FormGroup;
   columns: FormArray;
+  selectedQuestionnaire;
   
 
   constructor(
@@ -27,8 +29,10 @@ export class UploadfileComponent implements OnInit {
     this.uploadFileForm = this.createUploadForm();
   }
   
-  ngOnInit() {
+  async ngOnInit() {
     this.filename = "Choose .csv File";
+
+    this.userQuestionnaires = await this.http.get("api/fetch/questionnaire/all");
   }
 
   /**
@@ -76,33 +80,46 @@ export class UploadfileComponent implements OnInit {
   startUpload() {
     this.uploadInProgress = true;
   }
+
+  selected() {
+    console.log(this.selectedQuestionnaire);
+  }
+
   /**
    * Initiates the upload process where the file itself, along with
    * all the user inputed information is sent to the server and stored
    */
   async upload() {
     try {
-      const uploadRequest = Object.assign({}, this.uploadFileForm.value);
-      const uploadInformation = Object.assign({}, uploadRequest.importInfo);
-      const columns = Object.assign({}, uploadRequest.columns);
-      var columnArray = Object.keys(columns).map(i => columns[i]);
+      var questionnaireID: number;
 
-      console.log(columns);
-
-      var headersArray = [];
-
-      columnArray.forEach((header) => {
-        headersArray.push(header.columnName);
-      });
-
-      var questionnaireData = {
-        questionnaireName: uploadInformation.importName,
-        questionnaireHeaders: headersArray
+      if(this.selectedQuestionnaire !== undefined) {
+        questionnaireID = this.selectedQuestionnaire;
+      } else {
+        const uploadRequest = Object.assign({}, this.uploadFileForm.value);
+        const uploadInformation = Object.assign({}, uploadRequest.importInfo);
+        const columns = Object.assign({}, uploadRequest.columns);
+        var columnArray = Object.keys(columns).map(i => columns[i]);
+  
+        console.log(columns);
+  
+        var headersArray = [];
+  
+        columnArray.forEach((header) => {
+          headersArray.push(header.columnName);
+        });
+  
+        var questionnaireData = {
+          questionnaireName: uploadInformation.importName,
+          questionnaireHeaders: headersArray
+        }
+  
+        console.log(questionnaireData);
+        var questionnaireIDRequest = await this.http.post('api/insert/questionnaire/information', {questionnaireData: JSON.stringify(questionnaireData)});
+        questionnaireID = questionnaireIDRequest.value;
       }
-
-      console.log(questionnaireData);
-      var questionnaireID = await this.http.post('api/insert/questionnaire/information', {questionnaireData: JSON.stringify(questionnaireData)});
-      this.http.uploadFile(this.selectedFile, this.filename, questionnaireID.value);
+      console.log(questionnaireID);
+      this.http.uploadFile(this.selectedFile, this.filename, questionnaireID);
     } catch (error) {
       this.alertService.showError(error.message);
     }

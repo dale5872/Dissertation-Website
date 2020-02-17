@@ -419,6 +419,30 @@ app.route('/api/fetch/analysis/similarities').post((req, res) => {
     }
 });
 
+app.route('/api/fetch/questionnaire/all').get((req, res) => {
+    if(req.session.userID) {
+        if(global.DEBUG_FLAG) {
+            console.log(`DEBUG: Creating new questionnaire for user: ${req.session.userID}.`);
+        }
+
+        var userinfo = new UserInformation(req.session.userID);
+        var uip = userinfo.retrieve();
+                
+        var qc = Questionnaire.getAll(req.session.userID);
+
+        Promise.all([uip, qc]).then(vals => {
+            var responseObject = {
+                userProfile: vals[0],
+                dataObject: vals[1]
+            }
+
+            res.send(responseObject);
+        }).catch((error) => {
+            res.status(500).send(error.message);
+        });
+    }
+});
+
 /**
  * INSERTS
  */
