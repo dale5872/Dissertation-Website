@@ -6,6 +6,10 @@ import { DashboardComponent } from './dashboard.component';
 import { UploadfileComponent } from './uploadfile/uploadfile.component';
 import { ViewuploadsComponent } from './viewuploads/viewuploads.component';
 import { ViewreponsesComponent } from './viewuploads/viewreponses/viewreponses.component';
+import { ViewanalysisComponent } from './viewanalysis/viewanalysis.component';
+import { ViewComponent } from './viewanalysis/view/view.component';
+import { FullComponent } from './viewanalysis/full/full.component';
+import { DashboardContentComponent } from './dashboard-content/dashboard-content.component';
 
 
 @NgModule({
@@ -13,7 +17,11 @@ import { ViewreponsesComponent } from './viewuploads/viewreponses/viewreponses.c
     DashboardComponent,
     UploadfileComponent,
     ViewuploadsComponent,
-    ViewreponsesComponent
+    ViewreponsesComponent,
+    ViewanalysisComponent,
+    ViewComponent,
+    FullComponent,
+    DashboardContentComponent
   ],
   imports: [
     CommonModule,

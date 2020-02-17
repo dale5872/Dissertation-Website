@@ -1,0 +1,15 @@
+<router-outlet></router-outlet>
+
+<div class="container col-sm-12 mx-2 my-2" style="height: 94%">
+    <div *ngFor="let import of imports">
+        <div class="row">
+            <div class="col-sm-9">
+                <h5>{{import.filename}}</h5>
+                
+            </div>
+            <div class="col-sm-3">
+                <a class="text-primary" routerLink="full/{{import.importID}}/{{import.questionnaireID}}">View Analysis >></a>
+            </div>
+        </div>
+    </div>
+</div>

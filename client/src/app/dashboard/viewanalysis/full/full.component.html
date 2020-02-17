@@ -1,0 +1,173 @@
+<div class="container bg-white col-sm-9 my-2" style="position:fixed; z-index:200; height: 94%; overflow-y: scroll;">
+    <div class="row">
+        <div class="col-sm-3">
+            <button type="button" class="btn btn-secondary" routerLink="/dashboard/viewanalysis">Back</button>
+            <button type="button" class="btn btn-success" (click)="openHelpModal(help)">Help</button>
+        </div>
+        <div class="col-sm-9">
+            
+        </div>
+    </div>
+
+    <ng-template [ngIf]="similarityData !== undefined && importInformation !== undefined">
+        <div class="container mb-3 mx-0" id="information_container">
+            <div class="row">
+                <div class="col">
+                    <h5>Questionnaire: {{importInformation.filename}}</h5>
+                </div>
+                <div class="col">
+                    <h5>Import Date: {{importInformation.importDate}}</h5>
+                </div>
+                <div class="col">
+                    <h5>Import Method: {{importInformation.importMethod}}</h5>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <h5>Status: <p [ngClass]="{'text-success': importInformation.status == 'Complete' || importInformation.status =='Imported', 'text-warning': importInformation.status == 'Importing' || importInformation.status=='Analysing', 'text-danger': importInformation.status == 'Failed'}" >{{importInformation.status}}</p></h5>
+                </div>
+            </div>
+        </div>
+    
+        <div class="container mb-3 mx-0" id="analysis_container">
+            <div class="row">
+                <h3>Analysis</h3>
+            </div>
+            <div class="row">
+                <h5>Responses: {{importInformation.responses}}</h5>
+            </div>
+    
+            <div class="row">
+                <h5>Top Recommendations:</h5>
+            </div>
+     
+            <div class="row">
+                <ng-container *ngFor="let sim of similarityData">
+                    <ng-container *ngIf="sim.similarities > (importInformation.responses * 0.1) + 1">
+                        <div class="card col-sm-5 mr-4 mb-4">
+                            <div class="card-body">
+                                <div class="row">
+                                    <b>{{sim.headerName}}</b> 
+                                </div>
+                                <div class="row">
+                                    <p>{{sim.rawData}}</p>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-6"></div>
+                                    <div class="col-sm-6">
+                                        Similar Responses: {{sim.similarities}}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </ng-container>
+                </ng-container>
+            </div>
+        </div>
+    </ng-template>        
+
+    <div class="container mx-0" id="tables_container">
+        <div class="row">
+            <div class="table-responsive">
+                <h3 class="text-success">Accepted Responses</h3>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col" *ngFor="let header of headers">{{header}}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let response of tableDataAccepted">
+                            <td *ngFor="let col of response.rowData" [ngClass]="{'bg-success': col.classification_changed==1}" (click)="openModal(changeClassificationModal, col.entity_id, col.classification)">
+                                <ng-template [ngIf]="col.rawData !== undefined">
+                                        {{col.rawData}} 
+                                </ng-template>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    
+        <div class="row">
+            <div class="table-responsive">
+                <h3 class="text-danger">Rejected Responses</h3>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col" *ngFor="let header of headers">{{header}}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let response of tableDataRejected">
+                            <td *ngFor="let col of response.rowData" [ngClass]="{'bg-danger': col.classification_changed==1}" (click)="openModal(changeClassificationModal, col.entity_id, col.classification)">
+                                <ng-template [ngIf]="col.rawData !== undefined">
+                                    {{col.rawData}} 
+                                </ng-template>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #content let-modal>
+    <div class="modal-header">
+        <h4 class="modal-title">Entity Options</h4>
+    </div>
+    <div class="modal-body"> 
+        <div class="row mt-0 mb-3">
+            <small>Click any of the buttons to make changes to the entity</small>
+        </div>
+
+        <div class="row mt-0 mb-3">
+            <button type="button" class="btn btn-primary" (click)="openModal(changeClassificationModal)">Change Classification</button>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-danger" (click)="modal.close()">Close</button>
+    </div>
+</ng-template>
+
+
+<ng-template #changeClassificationModal let-modal>
+    <div class="modal-header">
+        <h4 class="modal-title">Are You Sure?</h4>
+    </div>
+    <div class="modal-body"> 
+        <div class="row mt-0 mb-3">
+            <small>Are you sure you want to change the classification of entity 
+                '{{currentEntity}}'?</small>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-primary" (click)="changeClassification(); modal.close()">Yes</button>
+        <button type="button" class="btn btn-danger" (click)="modal.close()">No</button>
+    </div>
+</ng-template>
+
+<ng-template #help let-modal>
+    <div class="modal-header">
+        <h4 class="modal-title">Help</h4>
+    </div>
+    <div class="modal-body"> 
+        <div class="row px-3 pt-2">
+            <p>
+                This page allows you to see the classification for each entity in the questionnaire. Any
+                empty entities are omitted and not analysed.
+            </p>
+
+            <p>
+                If a classification is incorrect, then clicking on the entity prompts you if you would like
+                to change the classification (from Accepted to Rejected and vice versa). Once a classification has
+                changed, it will automatically move to the correct table and be highlighted in green (for 
+                Rejected -> Accepted classfications) or red. 
+            </p>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-danger" (click)="modal.close()">Close</button>
+    </div>
+</ng-template>

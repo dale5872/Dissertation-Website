@@ -17,6 +17,8 @@ const UploadFile = require('./analysis/uploadfile.js');
 const Imports = require('./fetch/imports.js');
 const Responses = require('./fetch/responses.js');
 const Questionnaire = require('./fetch/questionnaire.js');
+const Analysis = require('./fetch/analysis.js');
+const Classification = require('./update/classification.js');
 
 global.DEBUG_FLAG = true;
 //-----------------------------------------------
@@ -170,6 +172,7 @@ app.post('/api/uploadfile', multipartMiddleware, (req, res) => {
     if(req.session.userID) {
         var userID = req.session.userID;
         var filepath = req.files.file.path;
+
         if(global.DEBUG_FLAG) {
             console.log(`DEBUG: Uploading file from ${userID}. Storing in ${filepath}`);
             console.log(req.files);
@@ -178,7 +181,7 @@ app.post('/api/uploadfile', multipartMiddleware, (req, res) => {
         res.write(`File ${filepath} has been uploaded. Importing into database...`);
 
         //run the python script
-        exec(`python3 '/home/dale/ml/src/initiator.py' --f '${filepath}' --u ${userID} --o ${req.body.filename}`, (err, stdout, stderr) => {
+        exec(`python3 '/home/dale/ml/src/initiator.py' --f '${filepath}' --u ${userID} --o ${req.body.filename} --q ${req.body.questionnaireID} > import_logs/import_${userID}_${req.body.questionnaireID}.log`, (err, stdout, stderr) => {
             if(err) {
                 console.log("ERROR: Could not run Python Script for analysis.");
                 console.log(err.message);
@@ -203,7 +206,11 @@ app.post('/api/uploadfile', multipartMiddleware, (req, res) => {
     }
 });
 
-app.route('/api/fetchimports').get((req, res) => {
+/**
+ *  IMPORT ROUTES 
+ */
+
+app.route('/api/fetch/imports').get((req, res) => {
     if(req.session.userID) {
         if(global.DEBUG_FLAG) {
             console.log(`DEBUG: Fetching Imports for user: ${req.session.userID}`);
@@ -211,8 +218,7 @@ app.route('/api/fetchimports').get((req, res) => {
 
         var userinfo = new UserInformation(req.session.userID);
         userinfo.retrieve().then((profile) => {
-            var fetchImports = new Imports(req.session.userID);
-            fetchImports.fetch().then((dataObject) => {
+            Imports.fetch(req.session.userID).then((dataObject) => {
                 var responseObject = {
                     userProfile: profile,
                     dataObject: dataObject
@@ -220,8 +226,8 @@ app.route('/api/fetchimports').get((req, res) => {
 
                 if(global.DEBUG_FLAG) {
                     console.log(`DEBUG: Imports Retrieved`);
+                    console.log(responseObject.dataObject);
                 }
-                console.log(responseObject.dataObject);
                 res.send(responseObject);
             }).catch((error) => {
                 res.status(400).send(error.message);
@@ -239,10 +245,50 @@ app.route('/api/fetchimports').get((req, res) => {
     }
 });
 
+
+app.route('/api/fetch/single').post((req, res) => {
+    if(req.session.userID) {
+        if(global.DEBUG_FLAG) {
+            console.log(`DEBUG: Fetching Import Information for import: ${req.body.importID}`);
+        }
+
+        var userinfo = new UserInformation(req.session.userID);
+        userinfo.retrieve().then((profile) => {
+            Imports.fetchSingle(req.body.importID).then((dataObject) => {
+                var responseObject = {
+                    userProfile: profile,
+                    dataObject: dataObject
+                };
+
+                if(global.DEBUG_FLAG) {
+                    console.log(`DEBUG: Import Information Retrieved`);
+                    console.log(responseObject.dataObject);
+                }
+                res.send(responseObject);
+            }).catch((error) => {
+                console.log(`ERROR: ${error.message}`);
+                res.status(400).send(error.message);
+            });
+        }).catch((error) => {
+            console.log(`ERROR: ${error.message}`);
+            res.status(400).send(error.message);
+        });
+
+    } else {
+        if(global.DEBUG_FLAG) {
+            console.log(`DEBUG: UserID was not present in cookie. Aborting...`);
+        }
+        res.status(401).send("User not Authorized");
+        // @todo: delete the file again
+    }
+
+});
+
+/********************* */
 app.route('/api/fetch/responses').post((req, res) =>  {
     if(req.session.userID) {
         if(global.DEBUG_FLAG) {
-            console.log(`DEBUG: Fetching Responses for user: ${req.session.userID}. Import: ${req.session.importID}`);
+            console.log(`DEBUG: Fetching Responses for user: ${req.session.userID}. Import: ${req.body.importID}`);
         }
 
         var userinfo = new UserInformation(req.session.userID);
@@ -276,14 +322,14 @@ app.route('/api/fetch/responses').post((req, res) =>  {
 app.route('/api/fetch/questionnaire').post((req, res) => {
     if(req.session.userID) {
         if(global.DEBUG_FLAG) {
-            console.log(`DEBUG: Fetching Responses for user: ${req.session.userID}. Import: ${req.session.importID}`);
+            console.log(`DEBUG: Fetching Responses for user: ${req.session.userID}. Import: ${req.body.importID}`);
         }
 
         var userinfo = new UserInformation(req.session.userID);
         var uip = userinfo.retrieve();
 
-        var fetchQuestionnaire = new Questionnaire(req.body.questionnaireID);
-        var fq = fetchQuestionnaire.fetch();
+        var fetchQuestionnaire = new Questionnaire();
+        var fq = fetchQuestionnaire.fetch(req.body.questionnaireID);
 
         Promise.all([uip, fq]).then(vals => {
             if(global.DEBUG_FLAG) {
@@ -306,6 +352,130 @@ app.route('/api/fetch/questionnaire').post((req, res) => {
         res.status(401).send("User not authorized");
     }
 
+});
+
+app.route('/api/fetch/analysis/full').post((req, res) => {
+    if(req.session.userID) {
+        if(global.DEBUG_FLAG) {
+            console.log(`DEBUG: Fetching Analysis for user: ${req.session.userID}. Import: ${req.body.importID}`);
+        }
+
+        var userinfo = new UserInformation(req.session.userID);
+        var uip = userinfo.retrieve();
+
+        var analysis = Analysis.fetchFullAnalysis(req.body.importID);
+
+        Promise.all([uip, analysis]).then(vals => {
+            if(global.DEBUG_FLAG) {
+                console.log(`DEBUG: Analysis fetched. Sending to client...`);
+            }
+            var responseObject = {
+                userProfile: vals[0],
+                dataObject: vals[1]
+            }
+            
+            res.send(responseObject);
+        }).catch((error) => {
+            res.status(500).send(error.message);
+        });
+    } else {
+        if(global.DEBUG_FLAG) {
+            console.log(`DEBUG: UserID was not present in cookie. Aborting...`);
+        }
+        res.status(401).send("User not authorized");
+    }
+
+});
+
+app.route('/api/fetch/analysis/similarities').post((req, res) => {
+    if(req.session.userID) {
+        if(global.DEBUG_FLAG) {
+            console.log(`DEBUG: Fetching Analysis Similaritiesx for user: ${req.session.userID}. Import: ${req.body.importID}`);
+        }
+
+        var userinfo = new UserInformation(req.session.userID);
+        var uip = userinfo.retrieve();
+
+        var similarities = Analysis.fetchSimilarities(req.body.importID);
+
+        Promise.all([uip, similarities]).then(vals => {
+            if(global.DEBUG_FLAG) {
+                console.log(`DEBUG: Analysis fetched. Sending to client...`);
+            }
+            var responseObject = {
+                userProfile: vals[0],
+                dataObject: vals[1]
+            }
+            
+            res.send(responseObject);
+        }).catch((error) => {
+            res.status(500).send(error.message);
+        });
+    } else {
+        if(global.DEBUG_FLAG) {
+            console.log(`DEBUG: UserID was not present in cookie. Aborting...`);
+        }
+        res.status(401).send("User not authorized");
+    }
+});
+
+/**
+ * INSERTS
+ */
+app.route('/api/insert/questionnaire').post((req, res) => {
+    if(req.session.userID) {
+        if(global.DEBUG_FLAG) {
+            console.log(`DEBUG: Creating new questionnaire for user: ${req.session.userID}.`);
+        }
+
+        var userinfo = new UserInformation(req.session.userID);
+        var uip = userinfo.retrieve();
+        
+        var questionnaireData = JSON.parse(req.body.questionnaireData);
+        
+        var questionnaire = new Questionnaire();
+        var qc = questionnaire.create(questionnaireData);
+
+        Promise.all([uip, qc]).then(vals => {
+            var responseObject = {
+                userProfile: vals[0],
+                dataObject: vals[1]
+            }
+
+            res.send(responseObject);
+        }).catch((error) => {
+            res.status(500).send(error.message);
+        });
+    }
+});
+
+/** 
+ * UPDATES
+ */
+app.route('/api/update/classification').post((req, res) => {
+    if(req.session.userID) {
+        if(global.DEBUG_FLAG) {
+            console.log(`DEBUG: Updating Classification for entity: ${req.body.entityID}.`);
+        }
+
+        var userinfo = new UserInformation(req.session.userID);
+        var uip = userinfo.retrieve();
+
+        console.log(req.body.entityID);
+        console.log(req.body.classification);
+        var classificationObj = new Classification(req.body.entityID, req.body.classification);
+        classificationObj.updateClassification();
+        
+        Promise.all([uip, classificationObj]).then((vals) => {
+            var responseObject = {
+                userProfile: vals[0],
+                dataObject: ''
+            }
+            res.send(responseObject);
+        }).catch((error) => {
+            res.status(500).send(error.message);
+        });
+    }
 });
 
 app.listen(3000);

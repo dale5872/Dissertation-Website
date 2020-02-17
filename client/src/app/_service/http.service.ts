@@ -59,11 +59,12 @@ export class HttpService {
     });
  }
 
-  uploadFile(file: File, filename: string): any {
+  uploadFile(file: File, filename: string, questionnaireID: number): any {
     //File must be added to a FormData object to be sent to the server
     let formData = new FormData();
     formData.append('file', file, file.name);
-    formData.append('filename', filename)
+    formData.append('filename', filename);
+    formData.append('questionnaireID', questionnaireID.toString());
 
     this.http.post("http://51.11.10.177:3000/api/uploadfile", formData, {
       withCredentials: true,
