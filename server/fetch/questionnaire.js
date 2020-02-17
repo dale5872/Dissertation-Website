@@ -84,7 +84,7 @@ class Questionnaire {
         
     }
 
-    async create(questionnaireData) {
+    static async create(questionnaireData, userID) {
         //Initialise database connection
         var connector = new Connector();
 
@@ -105,7 +105,7 @@ class Questionnaire {
                 } else {
 
                     //insert questionnaire request
-                    var insert_questionnaire_request = new Request(`INSERT INTO feedbackhub.questionnaire (questionnaire_name) VALUES ('${questionnaireData.questionnaireName}');`, (insert_QR_err, rowCount, rows) => {
+                    var insert_questionnaire_request = new Request(`INSERT INTO feedbackhub.questionnaire (questionnaire_name, user_ID) VALUES ('${questionnaireData.questionnaireName}', ${userID});`, (insert_QR_err, rowCount, rows) => {
                         if(insert_QR_err) {
                             console.error("ERROR: An SQL Error has occured. questionnaire.js:106");
                             console.error(insert_QR_err);

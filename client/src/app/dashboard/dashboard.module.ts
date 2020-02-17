@@ -10,6 +10,7 @@ import { ViewanalysisComponent } from './viewanalysis/viewanalysis.component';
 import { ViewComponent } from './viewanalysis/view/view.component';
 import { FullComponent } from './viewanalysis/full/full.component';
 import { DashboardContentComponent } from './dashboard-content/dashboard-content.component';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 
 @NgModule({
@@ -25,7 +26,9 @@ import { DashboardContentComponent } from './dashboard-content/dashboard-content
   ],
   imports: [
     CommonModule,
-    DashboardRoutingModule
+    DashboardRoutingModule,
+    FormsModule,
+    ReactiveFormsModule
   ]
 })
 export class DashboardModule { }
