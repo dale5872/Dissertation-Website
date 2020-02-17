@@ -68,11 +68,12 @@ class Analysis {
         });
         
         return new Promise((resolve, reject) => {
-            var request = new Request(`SELECT CAST(e.raw_data AS NVARCHAR(100)), s.similarities AS 'Similarities', i.import_ID
-            FROM (((feedbackhub.entity AS e
+            var request = new Request(`SELECT CAST(e.raw_data AS NVARCHAR(100)), s.similarities AS 'Similarities', i.import_ID, q.header_name
+            FROM ((((feedbackhub.entity AS e
                 INNER JOIN feedbackhub.similarities AS s ON s.entityID = e.entity_ID)
-                    INNER JOIN feedbackhub.response AS r ON e.response_ID = r.response_ID)
-                        INNER JOIN feedbackhub.import AS i ON r.import_ID = i.import_ID)
+                    INNER JOIN feedbackhub.questionnaire_headers AS q ON q.header_ID = e.questionnaire_header_ID)
+                        INNER JOIN feedbackhub.response AS r ON e.response_ID = r.response_ID)
+                            INNER JOIN feedbackhub.import AS i ON r.import_ID = i.import_ID)
             WHERE i.import_ID = ${importID} AND
                   s.similarities > 1
             ORDER BY s.similarities DESC;`, (err, rowCount, rows) => {
@@ -92,7 +93,8 @@ class Analysis {
                                 {
                                     rawData: column[0].value,
                                     similarities: column[1].value,
-                                    importID: column[2].value
+                                    importID: column[2].value,
+                                    headerName: column[3].value
                                 }
                             )
                         });
