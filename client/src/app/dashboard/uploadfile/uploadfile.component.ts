@@ -30,6 +30,9 @@ export class UploadfileComponent implements OnInit {
   }
   
   async ngOnInit() {
+    this.userQuestionnaires = {
+      imports: undefined
+    };
     this.filename = "Choose .csv File";
 
     this.userQuestionnaires = await this.http.get("api/fetch/questionnaire/all");
@@ -100,9 +103,7 @@ export class UploadfileComponent implements OnInit {
         const uploadInformation = Object.assign({}, uploadRequest.importInfo);
         const columns = Object.assign({}, uploadRequest.columns);
         var columnArray = Object.keys(columns).map(i => columns[i]);
-  
-        console.log(columns);
-  
+    
         var headersArray = [];
   
         columnArray.forEach((header) => {
@@ -114,7 +115,6 @@ export class UploadfileComponent implements OnInit {
           questionnaireHeaders: headersArray
         }
   
-        console.log(questionnaireData);
         var questionnaireIDRequest = await this.http.post('api/insert/questionnaire/information', {questionnaireData: JSON.stringify(questionnaireData)});
         questionnaireID = questionnaireIDRequest.value;
       }
