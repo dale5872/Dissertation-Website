@@ -526,9 +526,6 @@ app.route('/api/destroy/session').delete((req, res) => {
 });
 
 app.route('/api/validate/cookie').get((req, res) => {
-    if(global.DEBUG_FLAG) {
-        console.log(`DEBUG: Validating Cookie`);
-    }
     if(req.session.userID) {
         if(global.DEBUG_FLAG) {
             console.log(`DEBUG: Valid cookie for ${req.session.userID}`);
@@ -539,6 +536,18 @@ app.route('/api/validate/cookie').get((req, res) => {
             console.log(`DEBUG: A Cookie has been detected as being invalid`);
         }
         res.status(401).send("Not a valid cookie");
+    }
+});
+
+app.route('/api/regenerate/cookie').get((req, res) => {
+    if(req.session.userID) {
+        if(global.DEBUG_FLAG) {
+            console.log(`DEBUG: Regenerating Cookie for ${req.session.userID}`);
+        }
+        req.session.regenerate();
+        res.status(200).send("Regenerated");
+    } else {
+        res.status(401).send("User not authorised");
     }
 });
 

@@ -26,19 +26,19 @@ export class SessionService {
   }
 
   getUsername() {
-    return sessionStorage.getItem("username");
+    return this.cookieService.get("username");
   }
 
   getFirstName() {
-    return sessionStorage.getItem("fname");
+    return this.cookieService.get("fname");
   }
 
   getLastName() {
-    return sessionStorage.getItem("lname");
+    return this.cookieService.get("lname");
   }
 
   getEmail() {
-    return sessionStorage.getItem("email");
+    return this.cookieService.get("email");
   }
 
   /**
@@ -46,11 +46,10 @@ export class SessionService {
    * @param profile Class storing the logged in users information
    */
   setSessionData(profile: User) {
-    this.cookieService.set("username", profile.username, 3600, '/', '51.11.10.177', false);
-    sessionStorage.setItem("username", profile.username);
-    sessionStorage.setItem("fname", profile.fname);
-    sessionStorage.setItem("lname", profile.lname);
-    sessionStorage.setItem("email", profile.email);
+    this.cookieService.set("username", profile.username, 1, '/', '51.11.10.177', false);
+    this.cookieService.set("fname", profile.fname, 1, '/', '51.11.10.177', false);
+    this.cookieService.set("lname", profile.lname, 1, '/', '51.11.10.177', false);
+    this.cookieService.set("email", profile.email, 1, '/', '51.11.10.177', false);
     this._isAuthenticatedSubject.next(true);
   }
 
@@ -81,6 +80,7 @@ export class SessionService {
     this.http.get("http://51.11.10.177:3000/api/validate/cookie", {
       withCredentials: true
     }).subscribe(() => {
+      this.regenerateSession();
     }, (error) => {
       if(error.status === 401) {
         //invalid cookie
@@ -89,10 +89,21 @@ export class SessionService {
 
     });
   }
+
+  regenerateSession() {
+    this.http.get("http://51.11.10.177:3000/api/regenerate/cookie", { withCredentials: true }).subscribe(() => {
+    }, (error) => {
+      if(error.status === 401) {
+        this.logout();
+      }
+    });
+
+  }
+
+
   /**
    */
   logout() {
-    sessionStorage.clear();
     this.cookieService.deleteAll('/', '51.11.10.177');
 
     this.http.delete('http://51.11.10.177:3000/api/destroy/session', {
