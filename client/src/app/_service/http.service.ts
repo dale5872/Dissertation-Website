@@ -1,5 +1,5 @@
 import { Injectable, getModuleFactory } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { BootstrapAlertService } from 'ngx-bootstrap-alert-service';
 
 import { User } from '../_models/user';
@@ -33,6 +33,7 @@ export class HttpService {
   
         resolve(res.dataObject);
       }, (error) => {
+        this.handleError(error);
         reject(error.message);
       });
 
@@ -54,9 +55,21 @@ export class HttpService {
   
         resolve(res.dataObject);
       }, (error) => {
+        this.handleError(error);
         reject(error.message);
       });
     });
+ }
+
+ private handleError(error: HttpErrorResponse) {
+  if(error.error instanceof ErrorEvent) {
+    //we have a client side error
+  } else {
+    if(error.status === 401) {
+      //user unauthorised. usually means that the session has expired.
+      this.session.sessionExpired();
+    }
+  }
  }
 
   uploadFile(file: File, filename: string, questionnaireID: number): any {

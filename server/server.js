@@ -501,4 +501,45 @@ app.route('/api/update/classification').post((req, res) => {
     }
 });
 
+/**
+ * DESTROYS the current user's session
+ */
+app.route('/api/destroy/session').delete((req, res) => {
+    if(req.session.userID) {
+        var userID = req.session.userID;
+        if(global.DEBUG_FLAG) {
+            console.log(`DEBUG: Logging out user ${userID}`);
+        }
+        
+        req.session.destroy();
+        if(req.session === undefined) {
+            if(global.DEBUG_FLAG) {
+                console.log(`DEBUG: Destroyed Session. User ${userID} logged out successfully!`);
+            }
+
+            res.send("User Logged Out");
+        } else {
+            console.log(`ERROR: User ${userID} was not logged out. Session still active!!`);
+            res.status(500).send("Failed to logout");
+        }
+    }
+});
+
+app.route('/api/validate/cookie').get((req, res) => {
+    if(global.DEBUG_FLAG) {
+        console.log(`DEBUG: Validating Cookie`);
+    }
+    if(req.session.userID) {
+        if(global.DEBUG_FLAG) {
+            console.log(`DEBUG: Valid cookie for ${req.session.userID}`);
+        }
+        res.status(200).send("Valid Cookie");
+    } else {
+        if(global.DEBUG_FLAG) {
+            console.log(`DEBUG: A Cookie has been detected as being invalid`);
+        }
+        res.status(401).send("Not a valid cookie");
+    }
+});
+
 app.listen(3000);
