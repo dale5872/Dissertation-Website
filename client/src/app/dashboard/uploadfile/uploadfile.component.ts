@@ -1,6 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpService } from 'src/app/_service/http.service';
 import { BootstrapAlertService } from 'ngx-bootstrap-alert-service'
+import { FormControl, FormGroup, FormBuilder, FormArray, Form } from '@angular/forms';
+import { timingSafeEqual } from 'crypto';
+import { CombineLatestSubscriber } from 'rxjs/internal/observable/combineLatest';
 
 @Component({
   selector: 'app-uploadfile',
@@ -9,31 +12,114 @@ import { BootstrapAlertService } from 'ngx-bootstrap-alert-service'
 })
 export class UploadfileComponent implements OnInit {
   filename: string;
-  selectedFile: File;
+  selectedFile: File; 
+  uploadInProgress: boolean = false;
+  userQuestionnaires: any;
+  
+  uploadFileForm: FormGroup;
+  columns: FormArray;
+  selectedQuestionnaire;
+  
+
   constructor(
     private http: HttpService,
-    private alertService: BootstrapAlertService
+    private alertService: BootstrapAlertService,
+    private formBuilder: FormBuilder
   ) { 
+    this.uploadFileForm = this.createUploadForm();
   }
   
-  ngOnInit() {
+  async ngOnInit() {
+    this.userQuestionnaires = {
+      imports: undefined
+    };
     this.filename = "Choose .csv File";
+
+    this.userQuestionnaires = await this.http.get("api/fetch/questionnaire/all");
   }
 
+  /**
+   * This creates the form builder object for the 
+   * Upload Form 
+   */
+  createUploadForm() {
+    return this.formBuilder.group({
+      importInfo: this.formBuilder.group({
+        importName: ''
+      }),
+      columns: this.formBuilder.array([this.createColumn()])
+    });
+  }
+
+  /**
+   * Dynamically adds a new 'column' form object to the 
+   * FormArray, which also displays the controls to the user
+   */
+  addColumn() {
+    this.columns = this.uploadFileForm.get('columns') as FormArray;
+    this.columns.push(this.createColumn());
+  }
+  
+  /**
+   * This Creates the FormGroup object for each new column
+   */
+  createColumn(): FormGroup {
+    return this.formBuilder.group({
+      columnName: ''
+    });
+  }
+  
+  /**
+   * Displays the file input dialog box for the user to select 
+   * a file
+   * @param fileInput Event Object
+   */
   chooseFileEvent(fileInput: Event) {
     this.selectedFile = (<HTMLInputElement>fileInput.target).files[0];
     this.filename = this.selectedFile.name;
   }
 
+
+  startUpload() {
+    this.uploadInProgress = true;
+  }
+
+  selected() {
+    console.log(this.selectedQuestionnaire);
+  }
+
+  /**
+   * Initiates the upload process where the file itself, along with
+   * all the user inputed information is sent to the server and stored
+   */
   async upload() {
     try {
-      var questionnaireData = {
-        questionnaireName: 'SSC',
-        questionnaireHeaders: ['Stop', 'Start', 'Continue']
+      var questionnaireID: number;
+
+      if(this.selectedQuestionnaire !== undefined) {
+        questionnaireID = this.selectedQuestionnaire;
+      } else {
+        const uploadRequest = Object.assign({}, this.uploadFileForm.value);
+        const uploadInformation = Object.assign({}, uploadRequest.importInfo);
+        const columns = Object.assign({}, uploadRequest.columns);
+        var columnArray = Object.keys(columns).map(i => columns[i]);
+    
+        var headersArray = [];
+  
+        columnArray.forEach((header) => {
+          headersArray.push(header.columnName);
+        });
+  
+        var questionnaireData = {
+          questionnaireName: uploadInformation.importName,
+          questionnaireHeaders: headersArray
+        }
+  
+        var questionnaireIDRequest = await this.http.post('api/insert/questionnaire/information', {questionnaireData: JSON.stringify(questionnaireData)});
+        questionnaireID = questionnaireIDRequest.value;
       }
-      var questionnaireID = await this.http.post('api/insert/questionnaire', {questionnaireData: JSON.stringify(questionnaireData)});
-      console.log(questionnaireID.value);
-      this.http.uploadFile(this.selectedFile, this.filename, questionnaireID.value);
+      console.log(questionnaireID);
+      this.http.uploadFile(this.selectedFile, this.filename, questionnaireID);
     } catch (error) {
       this.alertService.showError(error.message);
     }
