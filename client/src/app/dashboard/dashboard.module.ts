@@ -11,6 +11,7 @@ import { ViewComponent } from './viewanalysis/view/view.component';
 import { FullComponent } from './viewanalysis/full/full.component';
 import { DashboardContentComponent } from './dashboard-content/dashboard-content.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { CreateQuestionnaireComponent } from './create-questionnaire/create-questionnaire.component';
 
 
 @NgModule({
@@ -22,7 +23,8 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
     ViewanalysisComponent,
     ViewComponent,
     FullComponent,
-    DashboardContentComponent
+    DashboardContentComponent,
+    CreateQuestionnaireComponent
   ],
   imports: [
     CommonModule,
