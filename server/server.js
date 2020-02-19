@@ -511,17 +511,15 @@ app.route('/api/destroy/session').delete((req, res) => {
             console.log(`DEBUG: Logging out user ${userID}`);
         }
         
-        req.session.destroy();
-        if(req.session === undefined) {
-            if(global.DEBUG_FLAG) {
-                console.log(`DEBUG: Destroyed Session. User ${userID} logged out successfully!`);
-            }
-
-            res.send("User Logged Out");
-        } else {
-            console.log(`ERROR: User ${userID} was not logged out. Session still active!!`);
-            res.status(500).send("Failed to logout");
+        req.session.destroy((err) => {
+            console.log(`DEBUG: Destroyed Session. User ${userID} logged out successfully!`);
+        });
+        res.status(200);
+    } else {
+        if(global.DEBUG_FLAG) {
+            console.log(`DEBUG: User tried to logout without being authenticated`);
         }
+        res.status(401).send("User not authorised");
     }
 });
 
