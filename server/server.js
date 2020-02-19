@@ -419,10 +419,34 @@ app.route('/api/fetch/analysis/similarities').post((req, res) => {
     }
 });
 
+app.route('/api/fetch/questionnaire/all').get((req, res) => {
+    if(req.session.userID) {
+        if(global.DEBUG_FLAG) {
+            console.log(`DEBUG: Creating new questionnaire for user: ${req.session.userID}.`);
+        }
+
+        var userinfo = new UserInformation(req.session.userID);
+        var uip = userinfo.retrieve();
+                
+        var qc = Questionnaire.getAll(req.session.userID);
+
+        Promise.all([uip, qc]).then(vals => {
+            var responseObject = {
+                userProfile: vals[0],
+                dataObject: vals[1]
+            }
+
+            res.send(responseObject);
+        }).catch((error) => {
+            res.status(500).send(error.message);
+        });
+    }
+});
+
 /**
  * INSERTS
  */
-app.route('/api/insert/questionnaire').post((req, res) => {
+app.route('/api/insert/questionnaire/information').post((req, res) => {
     if(req.session.userID) {
         if(global.DEBUG_FLAG) {
             console.log(`DEBUG: Creating new questionnaire for user: ${req.session.userID}.`);
@@ -433,8 +457,7 @@ app.route('/api/insert/questionnaire').post((req, res) => {
         
         var questionnaireData = JSON.parse(req.body.questionnaireData);
         
-        var questionnaire = new Questionnaire();
-        var qc = questionnaire.create(questionnaireData);
+        var qc = Questionnaire.create(questionnaireData, req.session.userID);
 
         Promise.all([uip, qc]).then(vals => {
             var responseObject = {
@@ -475,6 +498,54 @@ app.route('/api/update/classification').post((req, res) => {
         }).catch((error) => {
             res.status(500).send(error.message);
         });
+    }
+});
+
+/**
+ * DESTROYS the current user's session
+ */
+app.route('/api/destroy/session').delete((req, res) => {
+    if(req.session.userID) {
+        var userID = req.session.userID;
+        if(global.DEBUG_FLAG) {
+            console.log(`DEBUG: Logging out user ${userID}`);
+        }
+        
+        req.session.destroy((err) => {
+            console.log(`DEBUG: Destroyed Session. User ${userID} logged out successfully!`);
+        });
+        res.status(200);
+    } else {
+        if(global.DEBUG_FLAG) {
+            console.log(`DEBUG: User tried to logout without being authenticated`);
+        }
+        res.status(401).send("User not authorised");
+    }
+});
+
+app.route('/api/validate/cookie').get((req, res) => {
+    if(req.session.userID) {
+        if(global.DEBUG_FLAG) {
+            console.log(`DEBUG: Valid cookie for ${req.session.userID}`);
+        }
+        res.status(200).send("Valid Cookie");
+    } else {
+        if(global.DEBUG_FLAG) {
+            console.log(`DEBUG: A Cookie has been detected as being invalid`);
+        }
+        res.status(401).send("Not a valid cookie");
+    }
+});
+
+app.route('/api/regenerate/cookie').get((req, res) => {
+    if(req.session.userID) {
+        if(global.DEBUG_FLAG) {
+            console.log(`DEBUG: Regenerating Cookie for ${req.session.userID}`);
+        }
+        req.session.regenerate();
+        res.status(200).send("Regenerated");
+    } else {
+        res.status(401).send("User not authorised");
     }
 });
 
