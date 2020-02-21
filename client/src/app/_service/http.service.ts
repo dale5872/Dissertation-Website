@@ -29,7 +29,9 @@ export class HttpService {
         withCredentials: true
       }).subscribe((res: HttpReturn) => {
         var userProfile: User = res.userProfile;
-        this.session.setSessionData(userProfile);
+        if(userProfile !== undefined) {
+          this.session.setSessionData(userProfile);
+        }
   
         resolve(res.dataObject);
       }, (error) => {
@@ -51,8 +53,10 @@ export class HttpService {
         withCredentials: true
       }).subscribe((res: HttpReturn) => {
         var userProfile: User = res.userProfile;
-        this.session.setSessionData(userProfile);
-  
+        if(userProfile !== undefined) {
+          this.session.setSessionData(userProfile);
+        }
+        
         resolve(res.dataObject);
       }, (error) => {
         this.handleError(error);

@@ -84,7 +84,7 @@ app.get('/',function(req,res) {
 });
 
 //-----------------------------------------------
-//----------------- API ROUTES ------------------
+//---------------- AUTH & UPLOAD ----------------
 //-----------------------------------------------
 app.route('/api/auth/login').post(function(req, res) {
     var username = req.body.username;
@@ -206,9 +206,9 @@ app.post('/api/uploadfile', multipartMiddleware, (req, res) => {
     }
 });
 
-/**
- *  IMPORT ROUTES 
- */
+//-----------------------------------------------
+//----------------- FETCH -----------------------
+//-----------------------------------------------
 
 app.route('/api/fetch/imports').get((req, res) => {
     if(req.session.userID) {
@@ -441,6 +441,19 @@ app.route('/api/fetch/questionnaire/all').get((req, res) => {
             res.status(500).send(error.message);
         });
     }
+});
+
+app.route('/api/fetch/questionnaire/verify').post(async (req, res) => {
+    var questionnaireID = req.body.questionnaireID;
+    
+    var verification = await Questionnaire.verify(questionnaireID);
+    
+    var responseObject = {
+        userProfile: undefined,
+        dataObject: verification
+    }
+
+    res.send(responseObject);
 });
 
 //-----------------------------------------------

@@ -161,7 +161,9 @@ class Questionnaire {
                 } else {
 
                     //insert questionnaire request
-                    var insert_questionnaire_request = new Request(`INSERT INTO feedbackhub.questionnaire (questionnaire_name, user_ID, import_questionnaire) VALUES ('${questionnaireData.questionnaireName}', ${userID}, 1);`, (insert_QR_err, rowCount, rows) => {
+                    var insert_questionnaire_request = new Request(`INSERT INTO feedbackhub.questionnaire \
+                     (questionnaire_name, user_ID, answerable) \
+                      VALUES ('${questionnaireData.questionnaireName}', ${userID}, ${new_flag ? 1 : 0});`, (insert_QR_err, rowCount, rows) => {
                         if(insert_QR_err) {
                             console.error("ERROR: An SQL Error has occured. questionnaire.js:106");
                             console.error(insert_QR_err);
@@ -278,7 +280,7 @@ class Questionnaire {
         });
     }
 
-    static async createNew(userID, questionnaireData) {
+    static async verify(questionnaireID) {
         //Initialise database connection
         var connector = new Connector();
 
@@ -287,34 +289,32 @@ class Questionnaire {
         });
         
         return new Promise((resolve, reject) => {
+            if(global.DEBUG_FLAG) {
+                console.log(`DEBUG: Verifying a questionnaire is able to be answered. Questionnaire ID: ${questionnaireID}`);
+            }
 
-            //begin the transaction
-            connection.beginTransaction((begin_T_err) => {
-                if(begin_T_err) {
-                    console.error("ERROR: An SQL Error has occured. questionnaire.js:98");
-                    console.error(begin_T_err);
+            //get the questionnaire data
+            var request = new Request(`SELECT q.answerable
+            FROM feedbackhub.questionnaire AS Q
+            WHERE q.questionnaire_ID = ${questionnaireID}`, (err, rowCount, rows) => {
+                if(err) {
+                    console.error("ERROR: An SQL Error has occured");
+                    console.error(err.message);
                     reject("An unknown error has occured. Contact an administrator for help");
-                }
-                
-                //insert questionnaire
-                var request = new Request(`INSERT INTO feedbackhub.questionnaire \
-                    (questionnaire_name, user_ID, import_questionnaire) VALUES \
-                    ('${questionnaireData.questionnaireName}', ${userID}, 1`); (err, rowCount, rows) => {
-                    if(err) {
-                        console.error("ERROR: An SQL Error has occured");
-                        console.error(err.message);
-                        reject("An unknown error has occured. Contact an administrator for help");
+                } else {
+                    if(rowCount === 1) {
+                        //return the single result
+                        resolve(rows[0][0].value);
+                    } else {
+                        //as it either doesn't exist, or an external error has occured, it is invalid (i.e., 0)
+                        resolve(0);
                     }
-
-                    //get questionnaireID
-
-                } 
-                connection.execSql(request);
-
+                }
             });
+
+            connection.execSql(request);
         });
     }
-
 }
 
 module.exports = Questionnaire;
