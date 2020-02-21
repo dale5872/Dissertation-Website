@@ -140,7 +140,7 @@ class Questionnaire {
         });        
     }
 
-    static async create(questionnaireData, userID) {
+    static async import(questionnaireData, userID, new_flag) {
         //Initialise database connection
         var connector = new Connector();
 
@@ -161,7 +161,7 @@ class Questionnaire {
                 } else {
 
                     //insert questionnaire request
-                    var insert_questionnaire_request = new Request(`INSERT INTO feedbackhub.questionnaire (questionnaire_name, user_ID) VALUES ('${questionnaireData.questionnaireName}', ${userID});`, (insert_QR_err, rowCount, rows) => {
+                    var insert_questionnaire_request = new Request(`INSERT INTO feedbackhub.questionnaire (questionnaire_name, user_ID, import_questionnaire) VALUES ('${questionnaireData.questionnaireName}', ${userID}, 1);`, (insert_QR_err, rowCount, rows) => {
                         if(insert_QR_err) {
                             console.error("ERROR: An SQL Error has occured. questionnaire.js:106");
                             console.error(insert_QR_err);
@@ -208,19 +208,50 @@ class Questionnaire {
                                             if(global.DEBUG_FLAG) {
                                                 console.log(`DEBUG: Inserted ${rowCount} headers`);
                                             }
+                                            
+                                            //finally, we need to add to the import IFF it is a new questionnaire
+                                            if(new_flag) {
+                                                var request_new_import = new Request(`INSERT INTO feedbackhub.import \
+                                                (import_method, user_ID, status, responses, questionnaire_ID) \
+                                                VALUES ('questionnaire', ${userID}, 'Open', 0, ${questionnaireID.value})`, (err) => {
+                                                    if(err) {
+                                                        console.error("ERROR: An SQL Error has occured. questionnaire.js:218");
+                                                        console.error(err);
+                                                        connection.rollbackTransaction((rollback_T_err) => {
+                                                            if(rollback_T_err) {
+                                                                console.log(rollback_T_err);
+                                                            }
+                                                            reject();
+                                                        });
+                                                    } else {
+                                                        //we can commit the transaction
+                                                        connection.commitTransaction((end_T_err) => {
+                                                            if(end_T_err) {
+                                                                console.error("ERROR: An SQL Error has occured. questionnaire.js:162");
+                                                                console.error(end_T_err);
+                                                                reject("An unknown error has occured. Contact an administrator for help");
+                                                            } else {
+                                                                //we have succeeded
+                                                                resolve(questionnaireID);
+                                                            }
+                                                        });
+                                                    }
+                                                });
 
-                                            //commit transaction
-                                            connection.commitTransaction((end_T_err) => {
-                                                if(end_T_err) {
-                                                    console.error("ERROR: An SQL Error has occured. questionnaire.js:162");
-                                                    console.error(end_T_err);
-                                                    reject("An unknown error has occured. Contact an administrator for help");
-                                                } else {
-                                                    //we have succeeded
-                                                    resolve(questionnaireID);
-                                                }
-                                            });
-
+                                                connection.execSql(request_new_import);
+                                            } else {
+                                                //commit transaction
+                                                connection.commitTransaction((end_T_err) => {
+                                                    if(end_T_err) {
+                                                        console.error("ERROR: An SQL Error has occured. questionnaire.js:162");
+                                                        console.error(end_T_err);
+                                                        reject("An unknown error has occured. Contact an administrator for help");
+                                                    } else {
+                                                        //we have succeeded
+                                                        resolve(questionnaireID);
+                                                    }
+                                                });
+                                            }
                                         }
                                     });
 
@@ -245,8 +276,43 @@ class Questionnaire {
                 connection.execSql(insert_questionnaire_request);
             });
         });
+    }
 
+    static async createNew(userID, questionnaireData) {
+        //Initialise database connection
+        var connector = new Connector();
+
+        let connection = await connector.connect().catch((e) => {
+            throw new Error("Failed to connect to the database");
+        });
         
+        return new Promise((resolve, reject) => {
+
+            //begin the transaction
+            connection.beginTransaction((begin_T_err) => {
+                if(begin_T_err) {
+                    console.error("ERROR: An SQL Error has occured. questionnaire.js:98");
+                    console.error(begin_T_err);
+                    reject("An unknown error has occured. Contact an administrator for help");
+                }
+                
+                //insert questionnaire
+                var request = new Request(`INSERT INTO feedbackhub.questionnaire \
+                    (questionnaire_name, user_ID, import_questionnaire) VALUES \
+                    ('${questionnaireData.questionnaireName}', ${userID}, 1`); (err, rowCount, rows) => {
+                    if(err) {
+                        console.error("ERROR: An SQL Error has occured");
+                        console.error(err.message);
+                        reject("An unknown error has occured. Contact an administrator for help");
+                    }
+
+                    //get questionnaireID
+
+                } 
+                connection.execSql(request);
+
+            });
+        });
     }
 
 }

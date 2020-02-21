@@ -17,7 +17,12 @@
                 </div>
             </div>
             <button type="button" class="btn btn-outline-primary" (click)="addQuestion()">Add Question</button>
-            <button type="button" class="btn btn-success">Create</button>
+            <button type="button" class="btn btn-success" (click)="createQuestionnaire()">Create</button>
         </form>
+    </div>
+
+    <div class="row" *ngIf="questionnaireURL !== undefined">
+        <h6>Share your Questionnaire!</h6>
+        <a href="{{questionnaireURL}}">{{questionnaireURL}}</a>
     </div>
 </div>

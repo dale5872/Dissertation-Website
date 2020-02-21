@@ -13,6 +13,8 @@ export class CreateQuestionnaireComponent implements OnInit {
   questionnaireInfoForm: FormGroup;
   questions: FormArray;
 
+  questionnaireURL: string;
+
   constructor(    
     private http: HttpService,
     private alertService: BootstrapAlertService,
@@ -27,8 +29,8 @@ export class CreateQuestionnaireComponent implements OnInit {
 
   private createQuestionnaireForm(): FormGroup {
     return this.formBuilder.group({
-      questionnaireInfo: this.formBuilder.group({
-        questionnaireInfoData: ''
+      questionnaireInfoData: this.formBuilder.group({
+        questionnaireName: ''
       }),
       questions: this.formBuilder.array([this.createQuestion()])
     });
@@ -43,5 +45,32 @@ export class CreateQuestionnaireComponent implements OnInit {
   private addQuestion(): void {
     this.questions = this.questionnaireInfoForm.get('questions') as FormArray;
     this.questions.push(this.createQuestion());
+  }
+
+  async createQuestionnaire(): Promise<void> {
+    try {
+      //lets get the form data
+      const questionnaireFormGroup = Object.assign({}, this.questionnaireInfoForm.value);
+      const questionnaireInfoData = Object.assign({}, questionnaireFormGroup.questionnaireInfoData);
+      const questions = Object.assign({}, questionnaireFormGroup.questions);
+
+      //now we just want to get the questions themselves in an array
+      var questionsArray = Object.keys(questions).map(i => questions[i]).map(question => question.questionName);
+
+      var questionnaireData = {
+        questionnaireName: questionnaireInfoData.questionnaireName,
+        questionnaireHeaders: questionsArray
+      }
+      console.log(questionnaireData);
+
+      //commit to database
+      var questionnaireIDRequest = await this.http.post('api/insert/questionnaire/new', {questionnaireData: JSON.stringify(questionnaireData)});
+      var questionnaireID = questionnaireIDRequest.value;
+
+      //we now show the link to the user
+      this.questionnaireURL = `http://51.11.10.177:4200/questionnaire/${questionnaireID}`;
+    } catch(error) {
+      this.alertService.showError(error.message);
+    }
   }
 }
