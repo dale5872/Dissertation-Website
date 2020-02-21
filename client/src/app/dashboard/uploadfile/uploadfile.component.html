@@ -38,8 +38,8 @@
                 <h4>Columns</h4>
                 <div formArrayName="columns" *ngFor="let col of uploadFileForm.get('columns').controls; let i = index;">
                     <div [formGroupName]='i' class="form-group">
-                        <label for="columnName{{col}}">Column {{n}}</label>
-                        <input type="text" class="form-control" formControlName="columnName" placeholder="Column {{col}}">
+                        <label for="columnName{{i}}">Column {{i}}</label>
+                        <input type="text" class="form-control" formControlName="columnName" placeholder="Column {{i}}">
                     </div>
                 </div>
         
