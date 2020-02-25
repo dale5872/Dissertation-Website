@@ -1,1 +1,25 @@
-<p>questionnaire works!</p>
+<div class="container">
+    <div class="col-sm-6 col-offset-3">
+        <div class="row">
+            <h2>{{questionnaireName}}</h2>
+        </div>
+        <div class="row mb-3">
+            <small>Written by: {{writer}}</small>
+        </div>
+
+        <div class="row">
+            <form [formGroup]="questionnaire" class="col-sm-12 mx-0 px-0">
+                <div formArrayName="questions" *ngFor="let question of questionnaire.get('questions').controls; let i = index;">
+                    <div [formGroupName]="i" class="form-group mx-0 px-0">
+                        <h4>{{questionData[i].value}}</h4>
+                        <textarea class="form-control" formControlName="questionResponse" rows="3"></textarea>
+                    </div>
+                </div>
+                
+                <button type="button" class="btn btn-success" (click)="submitResponse()">Submit</button>
+            </form>
+        </div>
+    </div>
+
+    
+</div>

@@ -294,26 +294,78 @@ class Questionnaire {
             }
 
             //get the questionnaire data
-            var request = new Request(`SELECT q.answerable
-            FROM feedbackhub.questionnaire AS Q
-            WHERE q.questionnaire_ID = ${questionnaireID}`, (err, rowCount, rows) => {
+            var request = new Request(`SELECT q.questionnaire_name, u.firstName, u.lastName, i.import_ID
+            FROM ((feedbackhub.questionnaire AS q
+                INNER JOIN feedbackhub.user_information AS u ON u.user_ID = q.user_ID)
+                    INNER JOIN feedbackhub.import AS i ON i.questionnaire_ID = q.questionnaire_ID)
+            WHERE q.questionnaire_ID = ${questionnaireID} AND \
+            q.answerable = 1`, (err, rowCount, rows) => {
                 if(err) {
                     console.error("ERROR: An SQL Error has occured");
                     console.error(err.message);
                     reject("An unknown error has occured. Contact an administrator for help");
                 } else {
                     if(rowCount === 1) {
+                        var dataObject = {
+                            questionnaireName: rows[0][0].value,
+                            writtenBy: rows[0][1].value + " " + rows[0][2].value,
+                            importID: rows[0][3].value
+                        };
                         //return the single result
-                        resolve(rows[0][0].value);
+                        resolve(dataObject);
                     } else {
                         //as it either doesn't exist, or an external error has occured, it is invalid (i.e., 0)
-                        resolve(0);
+                        reject();
                     }
                 }
             });
 
             connection.execSql(request);
         });
+    }
+
+    static async fetchQuestions(questionnaireID) {
+        //Initialise database connection
+        var connector = new Connector();
+
+        let connection = await connector.connect().catch((e) => {
+            throw new Error("Failed to connect to the database");
+        });
+        
+        return new Promise((resolve, reject) => {
+            if(global.DEBUG_FLAG) {
+                console.log(`DEBUG: Verifying a questionnaire is able to be answered. Questionnaire ID: ${questionnaireID}`);
+            }
+
+            //get the questionnaire data
+            var request = new Request(`SELECT q.header_name
+            FROM feedbackhub.questionnaire_headers AS q
+            WHERE q.questionnaire_ID = ${questionnaireID}`, (err, rowCount, rows) => {
+                if(err) {
+                    console.error("ERROR: An SQL Error has occured");
+                    console.error(err.message);
+                    reject("An unknown error has occured. Contact an administrator for help");
+                } else {
+                    if(rowCount > 0) {
+                        var dataObject = {
+                            headers: []
+                        };
+
+                        rows.forEach(column => {
+                            dataObject.headers.push(column[0]);
+                        });
+
+                        //return the results
+                        resolve(dataObject);
+                    } else {
+                        //as it either doesn't exist, or an external error has occured, it is invalid (i.e., 0)
+                        reject();
+                    }
+                }
+            });
+
+            connection.execSql(request);
+        });        
     }
 }
 

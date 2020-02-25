@@ -61,7 +61,6 @@ export class CreateQuestionnaireComponent implements OnInit {
         questionnaireName: questionnaireInfoData.questionnaireName,
         questionnaireHeaders: questionsArray
       }
-      console.log(questionnaireData);
 
       //commit to database
       var questionnaireIDRequest = await this.http.post('api/insert/questionnaire/new', {questionnaireData: JSON.stringify(questionnaireData)});

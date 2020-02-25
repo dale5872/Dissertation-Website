@@ -443,17 +443,34 @@ app.route('/api/fetch/questionnaire/all').get((req, res) => {
     }
 });
 
-app.route('/api/fetch/questionnaire/verify').post(async (req, res) => {
+app.route('/api/fetch/questionnaire/verify').post((req, res) => {
     var questionnaireID = req.body.questionnaireID;
     
-    var verification = await Questionnaire.verify(questionnaireID);
+    Questionnaire.verify(questionnaireID).then((questionnaireData) => {
+        var responseObject = {
+            userProfile: undefined,
+            dataObject: questionnaireData
+        };
     
-    var responseObject = {
-        userProfile: undefined,
-        dataObject: verification
-    }
+        res.send(responseObject);
+    }).catch((error) => {
+        res.status(418).send("Page not found!");
+    });
+});
 
-    res.send(responseObject);
+app.route('/api/fetch/questionnaire/questions').post((req, res) => {
+    var questionnaireID = req.body.questionnaireID;
+
+    Questionnaire.fetchQuestions(questionnaireID).then((questionnaireQuestions) => {
+        var responseObject = {
+            userProfile: undefined,
+            dataObject: questionnaireQuestions
+        };
+
+        res.send(responseObject);
+    }).catch((error) => {
+        res.status(500).send(error.message);
+    });
 });
 
 //-----------------------------------------------
@@ -517,6 +534,35 @@ app.route('/api/insert/questionnaire/new').post((req, res) => {
             res.status(500).send(error.message);
         });
     }
+});
+
+app.route('/api/insert/questionnaire/response').post((req, res) => {
+    //we need to put the data into csv format
+    var JSONBody = JSON.parse(req.body.questionnaireData);
+    var responses = JSONBody.responses;
+    var responseString = '';
+
+    responses.forEach((entity) => {
+        responseString += entity + ',';
+    });
+
+    responseString = responseString.substring(0, responseString.length - 1);
+
+    exec(`python3 '/home/dale/ml/src/insertResponse.py' --d '${responseString}'  --q ${JSONBody.questionnaireID} --i ${JSONBody.importID} 2>&1 | tee -a response_logs/questionnaire_${JSONBody.questionnaireID}.log`, (err, stdout, stderr) => {
+        if(err) {
+            console.log("ERROR: Could not run Python Script for analysis.");
+            console.log(err.message);
+            res.status(500).send(err.message);
+        } else {
+            if(global.DEBUG_FLAG) {
+                console.log("DEBUG: Logging stdout...");
+                console.log(stdout);
+                console.log(stderr);
+            }
+            //no error so return OK
+            res.status(200).send("Inserted");
+        }
+    });
 });
 
 /** 
