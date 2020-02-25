@@ -76,6 +76,8 @@ export class HttpService {
       //error code 418 is 'I'm a teapot', is an easter egg for an april fools joke
       //using this as a questionnaire not found / invalid code
       this.alertService.showError("Questionnaire not Found!"); //TODO: make a 404 page
+    } else {
+      this.alertService.showError(`An Unknown Error Occured! \n ${error.message}`)
     }
   }
  }

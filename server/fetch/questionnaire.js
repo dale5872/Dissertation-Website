@@ -39,7 +39,7 @@ class Questionnaire {
                         });
 
                         //we have all the information, resolve promise
-                        resolve(dataObject)
+                        resolve(dataObject);
                     } else {
                         if(global.DEBUG_FLAG) {
                             console.log(`DEBUG: No responses to retrieve`);
@@ -294,7 +294,7 @@ class Questionnaire {
             }
 
             //get the questionnaire data
-            var request = new Request(`SELECT q.questionnaire_name, u.firstName, u.lastName, i.import_ID
+            var request = new Request(`SELECT q.questionnaire_name, u.firstName, u.lastName, i.import_ID, u.user_ID
             FROM ((feedbackhub.questionnaire AS q
                 INNER JOIN feedbackhub.user_information AS u ON u.user_ID = q.user_ID)
                     INNER JOIN feedbackhub.import AS i ON i.questionnaire_ID = q.questionnaire_ID)
@@ -309,7 +309,8 @@ class Questionnaire {
                         var dataObject = {
                             questionnaireName: rows[0][0].value,
                             writtenBy: rows[0][1].value + " " + rows[0][2].value,
-                            importID: rows[0][3].value
+                            importID: rows[0][3].value,
+                            writerID: rows[0][4].value
                         };
                         //return the single result
                         resolve(dataObject);

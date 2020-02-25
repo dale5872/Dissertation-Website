@@ -100,6 +100,8 @@ class Analysis {
                         });
                         console.log(dataObject);
                         resolve(dataObject)
+                    } else {
+                        resolve(undefined);
                     }
                 }
             });

@@ -23,10 +23,12 @@
         <div *ngIf="uploadInProgress == true">
             <h4>Import Upload Information</h4>
             <br />
+            <!--
             <h5>Select Previous Questionnaire</h5>
             <select class="form-control" [(ngModel)]="selectedQuestionnaire" (change)="selected()">
                 <option *ngFor="let q of userQuestionnaires.imports" [ngValue]="q.questionnaireID">{{q.questionnaireName}}</option>
             </select>
+            -->
 
             <h5>OR Create a New Questionnaire</h5>
             <form [formGroup]="uploadFileForm">

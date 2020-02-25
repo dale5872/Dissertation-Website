@@ -13,6 +13,7 @@ export class QuestionnaireComponent implements OnInit {
   questionnaireID: number;
   questionnaireName: string;
   writer: string;
+  writerID: string;
   questionData: Array<string>;
   importID: number;
 
@@ -39,6 +40,7 @@ export class QuestionnaireComponent implements OnInit {
       questionnaireID: this.questionnaireID
     }).then((questionnaireData) => {
       this.writer = questionnaireData.writtenBy;
+      this.writerID = questionnaireData.writerID;
       this.questionnaireName = questionnaireData.questionnaireName;
       this.importID = questionnaireData.importID;
 
@@ -86,7 +88,8 @@ export class QuestionnaireComponent implements OnInit {
       var questionnaireData = {
         questionnaireID: this.questionnaireID,
         responses: responsesArray,
-        importID: this.importID
+        importID: this.importID,
+        writerID: this.writerID
       }
 
       //commit to database

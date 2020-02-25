@@ -39,14 +39,19 @@ export class FullComponent implements OnInit {
       this.questionnaireID = params['questionnaireid'];
     });
 
-    let questionnaireData = this.http.post('api/fetch/questionnaire', {questionnaireID: this.questionnaireID});
-    let responseData = this.http.post('api/fetch/analysis/full', {importID : this.importID});
-    let importData = this.http.post('api/fetch/single', {importID: this.importID});
-    let similarityData = this.http.post('api/fetch/analysis/similarities', {importID: this.importID});
-
-    var promises = [questionnaireData, responseData, importData, similarityData];
-
+    var questionnaireData = this.http.post('api/fetch/questionnaire', {questionnaireID: this.questionnaireID});
+    var responseData = this.http.post('api/fetch/analysis/full', {importID : this.importID});
+    var importData = this.http.post('api/fetch/single', {importID: this.importID});
+    var similarityData = this.http.post('api/fetch/analysis/similarities', {importID: this.importID});
+    
+   
+    var promises = [questionnaireData, responseData , importData, similarityData];
+    //var promises = [questionnaireData, responseData , importData];
+    
+    console.log("Waiting for promises");
     Promise.all(promises).then(values => {
+      console.log(values);
+
       //lets deal with the data as they come in the promises array
       this.questionnaireName = values[0].questionnaireName;
       this.headers = values[0].headers;
@@ -54,8 +59,10 @@ export class FullComponent implements OnInit {
       var responses = values[1].imports;
 
       this.importInformation = values[2];
-      this.similarityData = values[3].imports;
-      console.log(values);
+
+      if(values[3] !== undefined) {
+        this.similarityData = values[3].imports;
+      }
 
       this.populateTable(responses);
     });

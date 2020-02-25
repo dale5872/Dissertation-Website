@@ -35,7 +35,7 @@ export class UploadfileComponent implements OnInit {
     };
     this.filename = "Choose .csv File";
 
-    this.userQuestionnaires = await this.http.get("api/fetch/questionnaire/all");
+    //this.userQuestionnaires = await this.http.get("api/fetch/questionnaire/all");
   }
 
   /**
