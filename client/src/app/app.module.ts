@@ -12,6 +12,7 @@ import { AuthGuard } from './_guards/auth.guard';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { BootstrapAlertModule } from 'ngx-bootstrap-alert-service';
 import { CookieService } from 'ngx-cookie-service';
+import { QuestionnaireComponent } from './questionnaire/questionnaire.component';
 
 
 @NgModule({
@@ -19,6 +20,7 @@ import { CookieService } from 'ngx-cookie-service';
     AppComponent,
     LoginComponent,
     RegisterComponent,
+    QuestionnaireComponent,
   ],
   imports: [
     BrowserModule,

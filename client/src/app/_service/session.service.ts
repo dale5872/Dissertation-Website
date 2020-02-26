@@ -46,10 +46,10 @@ export class SessionService {
    * @param profile Class storing the logged in users information
    */
   setSessionData(profile: User) {
-    this.cookieService.set("username", profile.username, 1, '/', '51.11.10.177', false);
-    this.cookieService.set("fname", profile.fname, 1, '/', '51.11.10.177', false);
-    this.cookieService.set("lname", profile.lname, 1, '/', '51.11.10.177', false);
-    this.cookieService.set("email", profile.email, 1, '/', '51.11.10.177', false);
+    this.cookieService.set("username", profile.username, 360, '/', '51.11.10.177', false);
+    this.cookieService.set("fname", profile.fname, 360, '/', '51.11.10.177', false);
+    this.cookieService.set("lname", profile.lname, 360, '/', '51.11.10.177', false);
+    this.cookieService.set("email", profile.email, 360, '/', '51.11.10.177', false);
     this._isAuthenticatedSubject.next(true);
   }
 
@@ -80,30 +80,19 @@ export class SessionService {
     this.http.get("http://51.11.10.177:3000/api/validate/cookie", {
       withCredentials: true
     }).subscribe(() => {
-      this.regenerateSession();
-    }, (error) => {
-      if(error.status === 401) {
-        //invalid cookie
-        this.logout();
-      }
-
-    });
-  }
-
-  regenerateSession() {
-    this.http.get("http://51.11.10.177:3000/api/regenerate/cookie", { withCredentials: true }).subscribe(() => {
+      return true;
     }, (error) => {
       if(error.status === 401) {
         this.logout();
-      }
+      } 
+      return false;
     });
-
   }
-
 
   /**
    */
   logout() {
+    sessionStorage.clear();
     this.cookieService.deleteAll('/', '51.11.10.177');
 
     this.http.delete('http://51.11.10.177:3000/api/destroy/session', {

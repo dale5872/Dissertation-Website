@@ -61,7 +61,8 @@ export class FullComponent implements OnInit {
       var responses = values[1].imports;
 
 
-      if(values[3] !== undefined) {
+      if(values[2] !== undefined) {
+        console.log(values[2]);
         this.similarityData = values[2].imports;
       }
 
