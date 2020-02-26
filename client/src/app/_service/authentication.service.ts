@@ -23,7 +23,7 @@ export class AuthenticationService {
   }
 
   register(profile: RegistrationModel) {
-    return this.http.post('http://51.11.10.177:3000/api/auth/login', {
+    return this.http.post('http://51.11.10.177:3000/api/auth/register', {
       username: profile.username,
       password: profile.password,
       email: profile.email,

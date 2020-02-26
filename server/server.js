@@ -133,9 +133,10 @@ app.route('/api/auth/register').post(function(req, res) {
     var profile = new UserProfile();
     profile.registerProfile(username, password, fname, lname, email);
 
-    var reg = new Registration(profile);
-    reg.register().then((message) => {
+    Registration.createAccountTransaction(profile).then((message) => {
         res.send(message);
+    }).catch((error) => {
+        res.status(500).send(error.message);
     });
 
 });
@@ -419,6 +420,39 @@ app.route('/api/fetch/analysis/similarities').post((req, res) => {
     }
 });
 
+app.route('/api/fetch/analysis/sentiment').post((req, res) => {
+    if(req.session.userID) {
+        if(global.DEBUG_FLAG) {
+            console.log(`DEBUG: Fetching Analysis Similaritiesx for user: ${req.session.userID}. Import: ${req.body.importID}`);
+        }
+
+        var userinfo = new UserInformation(req.session.userID);
+        var uip = userinfo.retrieve();
+
+        var similarities = Analysis.fetchSentiment(req.body.importID);
+
+        Promise.all([uip, similarities]).then(vals => {
+            if(global.DEBUG_FLAG) {
+                console.log(`DEBUG: Analysis fetched. Sending to client...`);
+            }
+            var responseObject = {
+                userProfile: vals[0],
+                dataObject: vals[1]
+            }
+            
+            res.send(responseObject);
+        }).catch((error) => {
+            res.status(500).send(error.message);
+        });
+    } else {
+        if(global.DEBUG_FLAG) {
+            console.log(`DEBUG: UserID was not present in cookie. Aborting...`);
+        }
+        res.status(401).send("User not authorized");
+    }
+});
+
+
 app.route('/api/fetch/questionnaire/all').get((req, res) => {
     if(req.session.userID) {
         if(global.DEBUG_FLAG) {
@@ -550,7 +584,7 @@ app.route('/api/insert/questionnaire/response').post((req, res) => {
 
     responseString = responseString.substring(0, responseString.length - 1);
 
-    exec(`python3 '/home/dale/ml/src/insertResponse.py' --d '${responseString}'  --q ${JSONBody.questionnaireID} --i ${JSONBody.importID} --u ${JSONBody.writerID} 2>&1 | tee -a response_logs/questionnaire_${JSONBody.questionnaireID}.log`, (err, stdout, stderr) => {
+    exec(`python3 \"/home/dale/ml/src/insertResponse.py\" --d \"${responseString}\"  --q ${JSONBody.questionnaireID} --i ${JSONBody.importID} --u ${JSONBody.writerID} 2>&1 | tee -a response_logs/questionnaire_${JSONBody.questionnaireID}.log`, (err, stdout, stderr) => {
         if(err) {
             console.log("ERROR: Could not run Python Script for analysis.");
             console.log(err.message);

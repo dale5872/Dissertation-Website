@@ -1,4 +1,4 @@
-<div class="container bg-white col-sm-12 my-2" style="height: 90vh; overflow-y:scroll;">
+<div class="container bg-white col-sm-12 my-2" style="height: 94vh; overflow-y:scroll;">
     <div class="row">
         <div class="col-sm-3">
             <button type="button" class="btn btn-secondary" routerLink="/dashboard/viewanalysis">Back</button>
@@ -35,11 +35,12 @@
     </ng-template>
 
 
-    <ng-template [ngIf]="similarityData !== undefined">
-        <div class="container mb-3 mx-0" id="analysis_container">
-            <div class="row">
-                <h3>Analysis</h3>
-            </div>
+    <div class="container mb-3 mx-0" id="analysis_container">
+        <div class="row">
+            <h3>Analysis</h3>
+        </div>
+
+        <ng-template [ngIf]="similarityData !== undefined">
             <div class="row">
                 <h5>Responses: {{importInformation.responses}}</h5>
             </div>
@@ -47,10 +48,10 @@
             <div class="row">
                 <h5>Top Recommendations:</h5>
             </div>
-     
+    
             <div class="row">
                 <ng-container *ngFor="let sim of similarityData">
-                    <ng-container *ngIf="sim.similarities > (importInformation.responses * 0.1) + 1">
+                    <ng-container *ngIf="sim.similarities >= importInformation.responses * 0.1">
                         <div class="card col-sm-5 mr-4 mb-4">
                             <div class="card-body">
                                 <div class="row">
@@ -70,8 +71,30 @@
                     </ng-container>
                 </ng-container>
             </div>
-        </div>
-    </ng-template>        
+        </ng-template>     
+        
+        <ng-template [ngIf]="sentimentData !== undefined">
+            <div class="row">
+                <h5>Sentiment Analysis:</h5>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <p class="text-success">Positive Responses: {{sentimentData.positive}}</p>
+                </div>
+                <div class="col">
+                    <p class="text-warning">Neutral Responses: {{sentimentData.neutral}}</p>
+                </div>
+                <div class="col">
+                    <p class="text-danger">Negative Responses: {{sentimentData.negative}}</p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <p>Overall Sentiment Point: <span [ngClass]="{'text-success': sentimentData.overall > 0, 'text-danger': sentimentData.overall < 0, 'text-warning': sentimentData.overall == 0}">{{sentimentData.overall}}</span></p>
+                </div>
+            </div>
+        </ng-template>
+    </div>
 
     <div class="container mx-0" id="tables_container">
         <div class="row">

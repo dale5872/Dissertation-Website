@@ -40,23 +40,26 @@ class Registration {
      * the database will rollback and no changes will be commited.
      * @param {Connection} connection - Tedious Connection Object to the Database
      */
-    async createAccountTransaction(connection) {
+    static async createAccountTransaction(profile) {
+        var connector = new Connector();
+        //if throwing error in the catch block, NodeJS Complains
+        //could possibly be solved in a try / catch block
+
+        let connection = await connector.connect().catch((error) => {
+            throw new Error("Failed to connect to database");
+        });
+
         return new Promise((resolve, reject) => {
-            if(global.DEBUG_FLAG) {
-                console.log(`DEBUG: Registration Promise accepted, now registering`);
-            }
-    
             connection.beginTransaction((err) => {
                 if(err) {
                     console.error(`ERROR: A FATAL ERROR HAS OCCURED`);
                     console.error(`${err.message}`);
                     reject("An unknown error has occured. Contact an administrator for help");
                 }
-                var accType = this.profile.lecturer ? "Lecturer" : "Student";
         
                 //lets create a new request for creating the user account
                 var request1 = new Request(
-                    `INSERT INTO feedbackhub.user_accounts VALUES ('${this.profile.username}', '${this.profile.password}'); 
+                    `INSERT INTO feedbackhub.user_accounts (username, password) VALUES ('${profile.username}', '${profile.password}'); 
                     SELECT @@IDENTITY;`,
                     (err) => {
                         if(err) {
@@ -65,7 +68,7 @@ class Registration {
                             console.error(`ERROR: Location registration.js, INSERT INTO user_accounts...`);
                             if(global.DEBUG_FLAG) {
                                 console.log(`DEBUG: Rolling back transaction...`);
-                                console.log(`DEBUG: Username ${this.profile.username}' was already taken`);
+                                console.log(`DEBUG: Username ${profile.username}' was already taken`);
                             }
 
                             //we have an error, rollback the transaction
@@ -83,19 +86,19 @@ class Registration {
                                     if(global.DEBUG_FLAG) {
                                         console.log(`DEBUG: Rollbacked successfully`);
                                     }
-                                    reject(`This username '${this.profile.username}' has already been taken.`);
+                                    reject(`This username '${profile.username}' has already been taken.`);
                                 }
                             });
                         } else {
                             if(global.DEBUG_FLAG) {
-                                console.log(`DEBUG: User Account has been created -> ${this.profile.username}`);
+                                console.log(`DEBUG: User Account has been created -> ${profile.username}`);
                                 console.log(`DEBUG: Inserting User Information`);
                             }
 
                             //we have created the account, now we create a new request to insert the user's information
                             //into the table with the new userID
                             var request2 = new Request(
-                                `INSERT INTO feedbackhub.user_information VALUES ('${parseInt(this.profile.userID)}', '${this.profile.fname}', '${this.profile.lname}', '${this.profile.email}')`,
+                                `INSERT INTO feedbackhub.user_information (userID, firstName, lastName, email) VALUES ('${parseInt(profile.userID)}', '${profile.fname}', '${profile.lname}', '${profile.email}')`,
                                 (err) => {
                                     if(err) {
                                         console.error("ERROR: An SQL Error Has Occured");
@@ -122,7 +125,7 @@ class Registration {
                                         });
                                     } else {
                                         if(global.DEBUG_FLAG) {
-                                            console.log(`DEBUG: User Information has been inserted ${this.profile.username} -> ${this.profile.userID}`);
+                                            console.log(`DEBUG: User Information has been inserted ${profile.username} -> ${profile.userID}`);
                                         }
                                         //we can now commit the transaction to the database
                                         connection.commitTransaction((err) => {
@@ -156,7 +159,7 @@ class Registration {
                         this.profile.userID = columns[0].value;
                         
                         if(global.DEBUG_FLAG) {
-                            console.log(`DEBUG: USER ID has been generated for ${this.profile.username} -> ${this.userID}`);
+                            console.log(`DEBUG: USER ID has been generated for ${profile.username} -> ${userID}`);
                         }
                 });
         

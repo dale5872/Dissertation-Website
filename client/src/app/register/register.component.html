@@ -5,6 +5,8 @@
                 <h4>Registration:</h4>
                 <p class="text-danger">NOTE: ALL user information (including) passwords is stored in plaintext and is not securely transmitted.
                      Please DO NOT use login information that is used elsewhere. ONLY use basic username and passwords</p>
+                <p class="text-danger">Currently the login page does not work properly and crashes the server due to the bugs. As such
+                    the registration form has been disabled</p>
             </div>
             <form [formGroup]="registrationForm">
                 <div class="form-group" formGroupName="registerControls">
@@ -30,7 +32,7 @@
                     <input type="text" class="form-control" formControlName="lastName">
                 </div>
 
-                <button type="submit" class="btn btn-primary" (click)="register()">Register</button>
+                <button type="submit" class="btn btn-primary disabled">Register</button>
             </form>
         </div>
     </div>

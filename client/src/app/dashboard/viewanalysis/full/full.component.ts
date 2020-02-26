@@ -25,6 +25,7 @@ export class FullComponent implements OnInit {
 
   importInformation: any; //Object can be seen in server/imports.js:92
   similarityData: any; //Object casn be seen in server/analysis.js:91
+  sentimentData: any; //Object can be seen in server/analysis.js:fetchSentiment()
 
   constructor(
     private http: HttpService,
@@ -46,8 +47,9 @@ export class FullComponent implements OnInit {
     var questionnaireData = this.http.post('api/fetch/questionnaire', {questionnaireID: this.questionnaireID});
     var responseData = this.http.post('api/fetch/analysis/full', {importID : this.importID});
     var similarityData = this.http.post('api/fetch/analysis/similarities', {importID: this.importID});
+    var sentimentData = this.http.post('api/fetch/analysis/sentiment', {importID: this.importID});
     
-    var promises = [questionnaireData, responseData, similarityData];
+    var promises = [questionnaireData, responseData, similarityData, sentimentData];
     //var promises = [questionnaireData, responseData , importData];
     
     console.log("Waiting for promises");
@@ -62,8 +64,11 @@ export class FullComponent implements OnInit {
 
 
       if(values[2] !== undefined) {
-        console.log(values[2]);
         this.similarityData = values[2].imports;
+      }
+
+      if(values[3] !== undefined) {
+        this.sentimentData = values[3];
       }
 
       this.populateTable(responses);
