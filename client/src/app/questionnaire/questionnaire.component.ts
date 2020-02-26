@@ -87,6 +87,10 @@ export class QuestionnaireComponent implements OnInit {
 
       var responsesArray = Object.keys(questions).map(i => questions[i]).map(question => question.questionResponse);
     
+      for(var i = 0; i < responsesArray.length; i++){ 
+        responsesArray[i] = responsesArray[i].replace(/[^a-zA-Z0-9 ]/g, "")
+      }
+
       var questionnaireData = {
         questionnaireID: this.questionnaireID,
         responses: responsesArray,
