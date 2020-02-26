@@ -20,6 +20,8 @@ export class QuestionnaireComponent implements OnInit {
   questionnaire: FormGroup;
   questions: FormArray;
 
+  submitted: boolean = false;
+
   constructor(
     private http: HttpService,
     private activatedRoute: ActivatedRoute,
@@ -95,13 +97,8 @@ export class QuestionnaireComponent implements OnInit {
       //commit to database
       this.http.post('api/insert/questionnaire/response', {
         questionnaireData: JSON.stringify(questionnaireData)
-      }).then(() => {
-        this.alertService.showSucccess("Submitted Response");
-        this.router.navigateByUrl('/');
-      }).catch((error) => {
-        this.alertService.showError(`Could not submit response. Error: ${error}`);
-        console.log(error.m);
       });
+      this.submitted = true;
     } catch(error) {
       this.alertService.showError(error.message);
     }

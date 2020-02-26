@@ -562,7 +562,7 @@ app.route('/api/insert/questionnaire/response').post((req, res) => {
                 console.log(stderr);
             }
             //no error so return OK
-            res.status(200).send("Inserted");
+            res.send("Inserted");
         }
     });
 });
