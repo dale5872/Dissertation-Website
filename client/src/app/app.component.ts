@@ -62,5 +62,12 @@ export class AppComponent implements OnInit {
     return this.session.getLastName();
   }
 
+  displayNavBar() {
+    var regexp = RegExp('/questionnaire/.');
+    if(regexp.test(this.router.url)) return false;
+    
+    return true;
+  }
+
   
 }
