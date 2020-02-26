@@ -53,7 +53,7 @@ app.use(express.urlencoded({
 app.use(bodyParser.urlencoded({extended : true}));
 app.use(bodyParser.json());
 
-const whitelist = ['http://localhost:4200', 'http://127.0.0.1:4200', 'http://51.11.10.177:4200', 'http://81.101.204.147'];
+const whitelist = ['http://localhost:4200', 'http://127.0.0.1:4200', 'http://51.11.10.177:4200', 'http://81.101.204.147', 'http://feedbackhub.uksouth.cloudapp.azure.com:4200'];
 var corsOptions = {
     origin: function (origin, callback) {
         if (whitelist.indexOf(origin) !== -1) {
@@ -84,7 +84,7 @@ app.get('/',function(req,res) {
 });
 
 //-----------------------------------------------
-//----------------- API ROUTES ------------------
+//---------------- AUTH & UPLOAD ----------------
 //-----------------------------------------------
 app.route('/api/auth/login').post(function(req, res) {
     var username = req.body.username;
@@ -206,9 +206,9 @@ app.post('/api/uploadfile', multipartMiddleware, (req, res) => {
     }
 });
 
-/**
- *  IMPORT ROUTES 
- */
+//-----------------------------------------------
+//----------------- FETCH -----------------------
+//-----------------------------------------------
 
 app.route('/api/fetch/imports').get((req, res) => {
     if(req.session.userID) {
@@ -443,13 +443,48 @@ app.route('/api/fetch/questionnaire/all').get((req, res) => {
     }
 });
 
+app.route('/api/fetch/questionnaire/verify').post((req, res) => {
+    var questionnaireID = req.body.questionnaireID;
+    
+    Questionnaire.verify(questionnaireID).then((questionnaireData) => {
+        var responseObject = {
+            userProfile: undefined,
+            dataObject: questionnaireData
+        };
+    
+        res.send(responseObject);
+    }).catch((error) => {
+        res.status(418).send("Page not found!");
+    });
+});
+
+app.route('/api/fetch/questionnaire/questions').post((req, res) => {
+    var questionnaireID = req.body.questionnaireID;
+
+    Questionnaire.fetchQuestions(questionnaireID).then((questionnaireQuestions) => {
+        var responseObject = {
+            userProfile: undefined,
+            dataObject: questionnaireQuestions
+        };
+
+        res.send(responseObject);
+    }).catch((error) => {
+        res.status(500).send(error.message);
+    });
+});
+
+//-----------------------------------------------
+//----------------- INSERTS ---------------------
+//-----------------------------------------------
+
 /**
- * INSERTS
+ * Imports an already answered questionnaire (i.e., importing a 
+ * csv file)
  */
 app.route('/api/insert/questionnaire/information').post((req, res) => {
     if(req.session.userID) {
         if(global.DEBUG_FLAG) {
-            console.log(`DEBUG: Creating new questionnaire for user: ${req.session.userID}.`);
+            console.log(`DEBUG: Importing questionnaire for user: ${req.session.userID}.`);
         }
 
         var userinfo = new UserInformation(req.session.userID);
@@ -457,7 +492,7 @@ app.route('/api/insert/questionnaire/information').post((req, res) => {
         
         var questionnaireData = JSON.parse(req.body.questionnaireData);
         
-        var qc = Questionnaire.create(questionnaireData, req.session.userID);
+        var qc = Questionnaire.import(questionnaireData, req.session.userID, false);
 
         Promise.all([uip, qc]).then(vals => {
             var responseObject = {
@@ -470,6 +505,66 @@ app.route('/api/insert/questionnaire/information').post((req, res) => {
             res.status(500).send(error.message);
         });
     }
+});
+
+/**
+ * Creates a new questionnaire for users to answer
+ */
+app.route('/api/insert/questionnaire/new').post((req, res) => {
+    if(req.session.userID) {
+        if(global.DEBUG_FLAG) {
+            console.log(`DEBUG: Creating new questionnaire for user: ${req.session.userID}.`);
+        }
+
+        var userinfo = new UserInformation(req.session.userID);
+        var uip = userinfo.retrieve();
+        
+        var questionnaireData = JSON.parse(req.body.questionnaireData);
+        
+        var qc = Questionnaire.import(questionnaireData, req.session.userID, true);
+
+        Promise.all([uip, qc]).then(vals => {
+            var responseObject = {
+                userProfile: vals[0],
+                dataObject: vals[1]
+            }
+
+            res.send(responseObject);
+        }).catch((error) => {
+            res.status(500).send(error.message);
+        });
+    }
+});
+
+app.route('/api/insert/questionnaire/response').post((req, res) => {
+    //we need to put the data into csv format
+    var JSONBody = JSON.parse(req.body.questionnaireData);
+    var responses = JSONBody.responses;
+    var responseString = '';
+
+    console.log(JSONBody);
+
+    responses.forEach((entity) => {
+        responseString += entity + ',';
+    });
+
+    responseString = responseString.substring(0, responseString.length - 1);
+
+    exec(`python3 '/home/dale/ml/src/insertResponse.py' --d '${responseString}'  --q ${JSONBody.questionnaireID} --i ${JSONBody.importID} --u ${JSONBody.writerID} 2>&1 | tee -a response_logs/questionnaire_${JSONBody.questionnaireID}.log`, (err, stdout, stderr) => {
+        if(err) {
+            console.log("ERROR: Could not run Python Script for analysis.");
+            console.log(err.message);
+            res.status(500).send(err.message);
+        } else {
+            if(global.DEBUG_FLAG) {
+                console.log("DEBUG: Logging stdout...");
+                console.log(stdout);
+                console.log(stderr);
+            }
+            //no error so return OK
+            res.status(200).send("Inserted");
+        }
+    });
 });
 
 /** 

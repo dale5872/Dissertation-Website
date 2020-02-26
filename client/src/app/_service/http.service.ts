@@ -29,7 +29,9 @@ export class HttpService {
         withCredentials: true
       }).subscribe((res: HttpReturn) => {
         var userProfile: User = res.userProfile;
-        this.session.setSessionData(userProfile);
+        if(userProfile !== undefined) {
+          this.session.setSessionData(userProfile);
+        }
   
         resolve(res.dataObject);
       }, (error) => {
@@ -51,8 +53,10 @@ export class HttpService {
         withCredentials: true
       }).subscribe((res: HttpReturn) => {
         var userProfile: User = res.userProfile;
-        this.session.setSessionData(userProfile);
-  
+        if(userProfile !== undefined) {
+          this.session.setSessionData(userProfile);
+        }
+        
         resolve(res.dataObject);
       }, (error) => {
         this.handleError(error);
@@ -68,6 +72,12 @@ export class HttpService {
     if(error.status === 401) {
       //user unauthorised. usually means that the session has expired.
       this.session.sessionExpired();
+    } else if(error.status == 418) {
+      //error code 418 is 'I'm a teapot', is an easter egg for an april fools joke
+      //using this as a questionnaire not found / invalid code
+      this.alertService.showError("Questionnaire not Found!"); //TODO: make a 404 page
+    } else {
+      this.alertService.showError(`An Unknown Error Occured! \n ${error.message}`)
     }
   }
  }

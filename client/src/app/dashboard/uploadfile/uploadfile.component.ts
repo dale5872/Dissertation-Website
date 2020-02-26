@@ -35,7 +35,7 @@ export class UploadfileComponent implements OnInit {
     };
     this.filename = "Choose .csv File";
 
-    this.userQuestionnaires = await this.http.get("api/fetch/questionnaire/all");
+    //this.userQuestionnaires = await this.http.get("api/fetch/questionnaire/all");
   }
 
   /**
@@ -106,6 +106,8 @@ export class UploadfileComponent implements OnInit {
     
         var headersArray = [];
   
+        //now we collate all the column headers in a single array
+        // (not wrapped in other objects)
         columnArray.forEach((header) => {
           headersArray.push(header.columnName);
         });
