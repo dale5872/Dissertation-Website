@@ -214,8 +214,8 @@ class Questionnaire {
                                             //finally, we need to add to the import IFF it is a new questionnaire
                                             if(new_flag) {
                                                 var request_new_import = new Request(`INSERT INTO feedbackhub.import \
-                                                (import_method, user_ID, status, responses, questionnaire_ID) \
-                                                VALUES ('questionnaire', ${userID}, 'Open', 0, ${questionnaireID.value})`, (err) => {
+                                                (import_method, user_ID, status, filename, responses, questionnaire_ID) \
+                                                VALUES ('questionnaire', ${userID}, 'Open', '${questionnaireData.questionnaireName}', 0, ${questionnaireID.value})`, (err) => {
                                                     if(err) {
                                                         console.error("ERROR: An SQL Error has occured. questionnaire.js:218");
                                                         console.error(err);

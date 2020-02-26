@@ -39,13 +39,15 @@ export class FullComponent implements OnInit {
       this.questionnaireID = params['questionnaireid'];
     });
 
+    this.http.post('api/fetch/single', {importID: this.importID}).then((value) => {
+      this.importInformation = value;
+    });
+
     var questionnaireData = this.http.post('api/fetch/questionnaire', {questionnaireID: this.questionnaireID});
     var responseData = this.http.post('api/fetch/analysis/full', {importID : this.importID});
-    var importData = this.http.post('api/fetch/single', {importID: this.importID});
     var similarityData = this.http.post('api/fetch/analysis/similarities', {importID: this.importID});
     
-   
-    var promises = [questionnaireData, responseData , importData, similarityData];
+    var promises = [questionnaireData, responseData, similarityData];
     //var promises = [questionnaireData, responseData , importData];
     
     console.log("Waiting for promises");
@@ -58,10 +60,9 @@ export class FullComponent implements OnInit {
 
       var responses = values[1].imports;
 
-      this.importInformation = values[2];
 
       if(values[3] !== undefined) {
-        this.similarityData = values[3].imports;
+        this.similarityData = values[2].imports;
       }
 
       this.populateTable(responses);

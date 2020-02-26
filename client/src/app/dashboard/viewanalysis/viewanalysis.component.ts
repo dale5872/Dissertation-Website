@@ -8,7 +8,7 @@ import { HttpService } from 'src/app/_service/http.service';
 })
 export class ViewanalysisComponent implements OnInit {
 
-  imports = [];
+  imports: Array<any>;
 
   constructor(
     private http: HttpService
@@ -19,9 +19,9 @@ export class ViewanalysisComponent implements OnInit {
   }
 
   async fetchImports() {
-    let jsonImports = await this.http.get('api/fetch/imports');
-    this.imports = jsonImports.imports;
-    //console.log(this.imports);
+    this.http.get('api/fetch/imports').then((imports) => {
+      this.imports = imports.imports;
+    });
   }
 
 }

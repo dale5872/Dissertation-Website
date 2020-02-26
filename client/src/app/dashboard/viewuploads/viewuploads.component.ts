@@ -10,7 +10,7 @@ import { __importDefault } from 'tslib';
 })
 export class ViewuploadsComponent implements OnInit {
 
-  imports = [];
+  imports: Array<any>;
 
   constructor(
     private http: HttpService,
@@ -22,8 +22,9 @@ export class ViewuploadsComponent implements OnInit {
   }
 
   async fetchImports() {
-    let jsonImports = await this.http.get('api/fetch/imports');
-    this.imports = jsonImports.imports;
+    this.http.get('api/fetch/imports').then((imports) => {
+      this.imports = imports.imports;
+    });
   }
 
 }

@@ -1,6 +1,11 @@
 <div class="col-12">
     <div class="d-flex justify-content-center">
         <div class="col-6">
+            <div class="row">
+                <h4>Registration:</h4>
+                <p class="text-danger">NOTE: ALL user information (including) passwords is stored in plaintext and is not securely transmitted.
+                     Please DO NOT use login information that is used elsewhere. ONLY use basic username and passwords</p>
+            </div>
             <form [formGroup]="registrationForm">
                 <div class="form-group" formGroupName="registerControls">
                     <label for="username">Username:</label>
@@ -10,13 +15,13 @@
                     <input type="password" class="form-control" formControlName="password">
 
                     <!-- @todo: Add Password Verification
-                        Currently, no verification is carried out on the client side -->
+                        Currently, no verification is carried out on the client side
                     <label for="password">Verify Password:</label>
                     <input type="password" class="form-control" id="verify_password_login">
+                    -->
 
                     <label for="password">Email:</label>
                     <input type="email" class="form-control" formControlName="email">
-                    <small id="passtip" class="form-text text-muted">Registration information is encrypted using the most secure encryption standards.</small>
 
                     <label for="fname">First Name:</label>
                     <input type="text" class="form-control" formControlName="firstName">

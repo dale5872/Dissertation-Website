@@ -8,6 +8,14 @@
         </div>
     </div>
 
+    <ng-template [ngIf]="tableData === undefined">
+        <div class="row">
+            <h4 *ngIf="tableData === undefined">There are no responses yet. Why not share the link?</h4>
+        </div>
+        <div class="row">
+            <a href="http://51.11.10.177:4200/questionnaire/{{questionnaireID}}">http://51.11.10.177:4200/questionnaire/{{questionnaireID}}</a>
+        </div>
+    </ng-template>
     <div class="row">
         <div class="table-responsive">
             <table class="table">
