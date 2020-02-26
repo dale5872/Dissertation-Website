@@ -39,7 +39,6 @@ export class AppComponent implements OnInit {
    */
   logout() {
     this.session.logout();
-    this.router.navigateByUrl('/');
   }
 
   /**
@@ -61,6 +60,13 @@ export class AppComponent implements OnInit {
    */
   getLastName() {
     return this.session.getLastName();
+  }
+
+  displayNavBar() {
+    var regexp = RegExp('/questionnaire/.');
+    if(regexp.test(this.router.url)) return false;
+    
+    return true;
   }
 
   

@@ -1,0 +1,28 @@
+<div class="container col-sm-12 px-2 mx-2">
+    <div class="row">
+        <h2>Create a New Questionnaire</h2>
+    </div>
+
+    <div class="row">
+        <form [formGroup]="questionnaireInfoForm" class="col-sm-6 col-md-8">
+            <div class="form-group" formGroupName="questionnaireInfoData">
+                <label for="questionnaireName">Questionnaire Title:</label>
+                <input type="text" class="form-control" formControlName="questionnaireName" placeholder="Questionnaire Title...">
+            </div>
+
+            <div formArrayName="questions" *ngFor="let question of questionnaireInfoForm.get('questions').controls; let i = index;">
+                <div [formGroupName]="i" class="form-group">
+                    <label for="question{{i}}">Question {{i + 1}}</label>
+                    <input type="text" class="form-control" formControlName="questionName" placeholder="Question {{i + 1}}">
+                </div>
+            </div>
+            <button type="button" class="btn btn-outline-primary" (click)="addQuestion()">Add Question</button>
+            <button type="button" class="btn btn-success" (click)="createQuestionnaire()">Create</button>
+        </form>
+    </div>
+
+    <div class="row" *ngIf="questionnaireURL !== undefined">
+        <h6>Share your Questionnaire!</h6>
+        <a href="{{questionnaireURL}}">{{questionnaireURL}}</a>
+    </div>
+</div>

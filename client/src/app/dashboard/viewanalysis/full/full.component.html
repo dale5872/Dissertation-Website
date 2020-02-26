@@ -1,4 +1,4 @@
-<div class="container bg-white col-sm-9 my-2" style="position:fixed; z-index:200; height: 94%; overflow-y: scroll;">
+<div class="container bg-white col-sm-12 my-2" style="height: 90vh; overflow-y:scroll;">
     <div class="row">
         <div class="col-sm-3">
             <button type="button" class="btn btn-secondary" routerLink="/dashboard/viewanalysis">Back</button>
@@ -9,7 +9,8 @@
         </div>
     </div>
 
-    <ng-template [ngIf]="similarityData !== undefined && importInformation !== undefined">
+
+    <ng-template [ngIf]="importInformation !== undefined">
         <div class="container mb-3 mx-0" id="information_container">
             <div class="row">
                 <div class="col">
@@ -26,9 +27,15 @@
                 <div class="col">
                     <h5>Status: <p [ngClass]="{'text-success': importInformation.status == 'Complete' || importInformation.status =='Imported', 'text-warning': importInformation.status == 'Importing' || importInformation.status=='Analysing', 'text-danger': importInformation.status == 'Failed'}" >{{importInformation.status}}</p></h5>
                 </div>
+                <div class="col">
+                    <h5>Questionnaire Link:</h5><a href="http://51.11.10.177:4200/questionnaire/{{questionnaireID}}">http://51.11.10.177:4200/questionnaire/{{questionnaireID}}</a>
+                </div>
             </div>
         </div>
-    
+    </ng-template>
+
+
+    <ng-template [ngIf]="similarityData !== undefined">
         <div class="container mb-3 mx-0" id="analysis_container">
             <div class="row">
                 <h3>Analysis</h3>

@@ -10,7 +10,7 @@ import { PromiseType } from 'protractor/built/plugins';
 })
 export class ViewreponsesComponent implements OnInit {
 
-  tableData = [];
+  tableData = undefined;
   questionnaireName: string;
   questionnaireData: Object;
   headers = [];
@@ -50,6 +50,7 @@ export class ViewreponsesComponent implements OnInit {
     var numOfHeaders = this.headers.length;
     var numOfResponses = responses.length;
     var rows = numOfResponses / numOfHeaders;
+    this.tableData = [];
 
     for(var i = 0; i < rows; i++) {
       var row = {

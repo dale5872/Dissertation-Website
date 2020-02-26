@@ -1,7 +1,12 @@
 <router-outlet></router-outlet>
 
-<div class="container col-sm-12 mx-2 my-2" style="height:94%">
+<div class="container col-sm-12 mx-2 my-2" style="height:90vh" *ngIf="displayable()">
     <div class="col-sm-12">
+        <h4>View Raw Responses</h4>
+        <p>This section is for viewing the raw questionnaire responses. For viewing the full analysis, please select 'View Analysis' from the left panel</p>
+        <div *ngIf="imports === undefined">
+            <p class="text-danger">There are no questionnaires. Please create or import one from the panel on the left</p>
+        </div>
         <div *ngFor="let import of imports">
             <div class="row mb-2">
                 <div class="card col-sm-12">
@@ -33,9 +38,11 @@
                                 <div class="row">
                                     <a class="text-primary" routerLink="/dashboard/viewuploads/viewresponses/{{import.importID}}/{{import.questionnaireID}}">View Responses</a>
                                 </div>
+                                <!--
                                 <div class="row" *ngIf="import.status=='Complete'">
                                     <a class="text-primary" routerLink="/dashboard/viewanalysis/view/{{import.importID}}/{{import.questionnaireID}}">View Analysis</a>
                                 </div>
+                            -->
                                 <div class="row">
                                     <a class="text-danger">Delete Import</a>
                                 </div>

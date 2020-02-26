@@ -10,6 +10,7 @@ import { ViewanalysisComponent } from './viewanalysis/viewanalysis.component';
 import { ViewComponent } from './viewanalysis/view/view.component';
 import { FullComponent } from './viewanalysis/full/full.component';
 import { DashboardContentComponent } from './dashboard-content/dashboard-content.component';
+import { CreateQuestionnaireComponent } from './create-questionnaire/create-questionnaire.component';
 
 
 
@@ -57,6 +58,11 @@ const routes: Routes = [
             canActivate: [AuthGuard]
           }
         ]
+      },
+      {
+        path: 'createquestionnaire',
+        component: CreateQuestionnaireComponent,
+        canActivate: [AuthGuard]
       }
     ]
   }

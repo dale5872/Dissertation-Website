@@ -1,6 +1,11 @@
 <router-outlet></router-outlet>
 
-<div class="container col-sm-12 mx-2 my-2" style="height: 94%">
+<div class="container col-sm-12 mx-2 my-2" style="height: 90vh; overflow-y:scroll;" *ngIf="displayable()">
+    <h4>View Questionnaire Analysis</h4>
+    <p>This section is for viewing the analysis conducted on each questionnaire</p>
+    <div *ngIf="imports === undefined">
+        <h4>There are no questionnaires. Please create or import one from the panel on the left</h4>
+    </div>
     <div *ngFor="let import of imports">
         <div class="row">
             <div class="col-sm-9">

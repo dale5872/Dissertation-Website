@@ -1,0 +1,14 @@
+.displayNavBar {
+    padding-top: 56px;
+}
+
+html, body {
+    min-height: 100vh;
+    height:auto;
+    margin:0;
+    overflow:auto;
+}
+
+app-root{
+    height:100%;
+}

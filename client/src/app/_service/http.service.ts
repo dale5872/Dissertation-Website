@@ -1,5 +1,5 @@
 import { Injectable, getModuleFactory } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { BootstrapAlertService } from 'ngx-bootstrap-alert-service';
 
 import { User } from '../_models/user';
@@ -29,10 +29,13 @@ export class HttpService {
         withCredentials: true
       }).subscribe((res: HttpReturn) => {
         var userProfile: User = res.userProfile;
-        this.session.setSessionData(userProfile);
+        if(userProfile !== undefined) {
+          this.session.setSessionData(userProfile);
+        }
   
         resolve(res.dataObject);
       }, (error) => {
+        this.handleError(error);
         reject(error.message);
       });
 
@@ -50,13 +53,33 @@ export class HttpService {
         withCredentials: true
       }).subscribe((res: HttpReturn) => {
         var userProfile: User = res.userProfile;
-        this.session.setSessionData(userProfile);
-  
+        if(userProfile !== undefined) {
+          this.session.setSessionData(userProfile);
+        }
+        
         resolve(res.dataObject);
       }, (error) => {
+        this.handleError(error);
         reject(error.message);
       });
     });
+ }
+
+ private handleError(error: HttpErrorResponse) {
+  if(error.error instanceof ErrorEvent) {
+    //we have a client side error
+  } else {
+    if(error.status === 401) {
+      //user unauthorised. usually means that the session has expired.
+      this.session.sessionExpired();
+    } else if(error.status === 418) {
+      //error code 418 is 'I'm a teapot', is an easter egg for an april fools joke
+      //using this as a questionnaire not found / invalid code
+      this.alertService.showError("Questionnaire not Found!"); //TODO: make a 404 page
+    } else if(error.status === 500) {
+      this.alertService.showError(`Server Error: ${error.message}`);
+    }
+  }
  }
 
   uploadFile(file: File, filename: string, questionnaireID: number): any {
