@@ -46,10 +46,10 @@ export class SessionService {
    * @param profile Class storing the logged in users information
    */
   setSessionData(profile: User) {
-    this.cookieService.set("username", profile.username, 360, '/', '51.11.10.177', false);
-    this.cookieService.set("fname", profile.fname, 360, '/', '51.11.10.177', false);
-    this.cookieService.set("lname", profile.lname, 360, '/', '51.11.10.177', false);
-    this.cookieService.set("email", profile.email, 360, '/', '51.11.10.177', false);
+    this.cookieService.set("username", profile.username, 360, '/', 'feedbackhub.uksouth.cloudapp.azure.com', false);
+    this.cookieService.set("fname", profile.fname, 360, '/', 'feedbackhub.uksouth.cloudapp.azure.com', false);
+    this.cookieService.set("lname", profile.lname, 360, '/', 'feedbackhub.uksouth.cloudapp.azure.com', false);
+    this.cookieService.set("email", profile.email, 360, '/', 'feedbackhub.uksouth.cloudapp.azure.com', false);
     this._isAuthenticatedSubject.next(true);
   }
 

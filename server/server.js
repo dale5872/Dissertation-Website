@@ -53,7 +53,7 @@ app.use(express.urlencoded({
 app.use(bodyParser.urlencoded({extended : true}));
 app.use(bodyParser.json());
 
-const whitelist = ['http://localhost:4200', 'http://127.0.0.1:4200', 'http://51.11.10.177:4200', 'http://81.101.204.147', 'http://feedbackhub.uksouth.cloudapp.azure.com:4200'];
+const whitelist = ['http://localhost:4200', 'http://127.0.0.1:4200', 'http://51.11.10.177:4200', 'http://feedbackhub.uksouth.cloudapp.azure.com:4200'];
 var corsOptions = {
     origin: function (origin, callback) {
         if (whitelist.indexOf(origin) !== -1) {
@@ -94,7 +94,7 @@ app.route('/api/auth/login').post(function(req, res) {
     userProfile.loginProfile(username, password);
 
     if(global.DEBUG_FLAG) {
-        console.log(`Recieved POST Request with headers username=${username}:password=${password}`);
+        console.log(`DEBUG: Recieved POST Request with headers username=${username}:password=${password}`);
     }
 
     //using promises (i.e., syncronous execution, we authenticate the user)

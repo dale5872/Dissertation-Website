@@ -28,7 +28,7 @@
                     <h5>Status: <p [ngClass]="{'text-success': importInformation.status == 'Complete' || importInformation.status =='Imported', 'text-warning': importInformation.status == 'Importing' || importInformation.status=='Analysing', 'text-danger': importInformation.status == 'Failed'}" >{{importInformation.status}}</p></h5>
                 </div>
                 <div class="col">
-                    <h5>Questionnaire Link:</h5><a href="http://51.11.10.177:4200/questionnaire/{{questionnaireID}}">http://51.11.10.177:4200/questionnaire/{{questionnaireID}}</a>
+                    <h5>Questionnaire Link:</h5><a href="http://feedbackhub.uksouth.cloudapp.azure.com:4200/questionnaire/{{questionnaireID}}">http://feedbackhub.uksouth.cloudapp.azure.com:4200/questionnaire/{{questionnaireID}}</a>
                 </div>
             </div>
         </div>
