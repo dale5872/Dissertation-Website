@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { HttpService } from 'src/app/_service/http.service';
 import { ActivatedRoute } from '@angular/router';
 import { PromiseType } from 'protractor/built/plugins';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-viewreponses',
@@ -19,7 +20,8 @@ export class ViewreponsesComponent implements OnInit {
 
   constructor(
     private http: HttpService,
-    private activatedRoute: ActivatedRoute
+    private activatedRoute: ActivatedRoute,
+    private title: Title
   ) { }
 
   async ngOnInit() {
@@ -35,6 +37,8 @@ export class ViewreponsesComponent implements OnInit {
       var responses = values[1].responses;
       this.questionnaireName = values[0].questionnaireName;
       this.headers = values[0].headers;
+
+      this.title.setTitle(`${this.questionnaireName} | FeedbackHub`);
 
       this.populateTable(responses);
     });

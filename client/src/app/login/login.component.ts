@@ -2,11 +2,11 @@ import { Component, OnInit, ApplicationRef } from '@angular/core';
 import { AuthenticationService } from '../_service/authentication.service';
 import { SessionService } from '../_service/session.service';
 import { Router } from '@angular/router';
-import { FormControl, FormGroup, FormBuilder } from '@angular/forms';
+import { FormGroup, FormBuilder } from '@angular/forms';
+import { Title } from '@angular/platform-browser';
 
 import { User } from '../_models/user';
 import { LoginModel } from '../_models/login';
-import { removeSummaryDuplicates, ParseSourceFile } from '@angular/compiler';
 
 @Component({
   selector: 'app-login',
@@ -21,7 +21,7 @@ export class LoginComponent implements OnInit {
     private session: SessionService,
     private router: Router,
     private formBuilder: FormBuilder,
-    private ref: ApplicationRef
+    private title: Title
   ) { 
     this.loginForm = this.createForm();
   }
@@ -31,6 +31,7 @@ export class LoginComponent implements OnInit {
     if(this.session.isLoggedIn()) {
       this.router.navigateByUrl('/dashboard');
     }
+    this.title.setTitle("Login | FeedbackHub");
   }
 
   /**

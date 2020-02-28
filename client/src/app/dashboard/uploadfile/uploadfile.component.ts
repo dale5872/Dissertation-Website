@@ -1,9 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpService } from 'src/app/_service/http.service';
 import { BootstrapAlertService } from 'ngx-bootstrap-alert-service'
-import { FormControl, FormGroup, FormBuilder, FormArray, Form } from '@angular/forms';
-import { timingSafeEqual } from 'crypto';
-import { CombineLatestSubscriber } from 'rxjs/internal/observable/combineLatest';
+import { FormGroup, FormBuilder, FormArray } from '@angular/forms';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-uploadfile',
@@ -24,12 +23,14 @@ export class UploadfileComponent implements OnInit {
   constructor(
     private http: HttpService,
     private alertService: BootstrapAlertService,
-    private formBuilder: FormBuilder
+    private formBuilder: FormBuilder,
+    private title: Title
   ) { 
     this.uploadFileForm = this.createUploadForm();
   }
   
   async ngOnInit() {
+    this.title.setTitle("Upload Questionnaire | FeedbackHub");
     this.userQuestionnaires = {
       imports: undefined
     };

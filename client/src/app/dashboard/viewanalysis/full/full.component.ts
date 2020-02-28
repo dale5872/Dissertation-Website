@@ -4,6 +4,7 @@ import { ActivatedRoute } from '@angular/router';
 import { compileInjectable, ThrowStmt } from '@angular/compiler';
 import {NgbModal, ModalDismissReasons} from '@ng-bootstrap/ng-bootstrap';
 import { BootstrapAlertService } from 'ngx-bootstrap-alert-service';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-full',
@@ -31,7 +32,8 @@ export class FullComponent implements OnInit {
     private http: HttpService,
     private activatedRoute: ActivatedRoute,
     private modalService: NgbModal,
-    private alertService: BootstrapAlertService
+    private alertService: BootstrapAlertService,
+    private title: Title
   ) { }
 
   ngOnInit() {
@@ -59,6 +61,8 @@ export class FullComponent implements OnInit {
       //lets deal with the data as they come in the promises array
       this.questionnaireName = values[0].questionnaireName;
       this.headers = values[0].headers;
+
+      this.title.setTitle(`${this.questionnaireName} Analysis | FeedbackHub`);
 
       var responses = values[1].imports;
 

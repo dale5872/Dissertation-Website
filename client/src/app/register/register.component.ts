@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { SessionService } from '../_service/session.service';
 import { Router } from '@angular/router';
 import { FormBuilder, FormGroup } from '@angular/forms';
+import { Title } from '@angular/platform-browser';
 
 import { RegistrationModel } from '../_models/registration';
 import { AuthenticationService } from '../_service/authentication.service';
@@ -18,7 +19,8 @@ export class RegisterComponent implements OnInit {
     private authService: AuthenticationService,
     private session: SessionService,
     private router: Router,
-    private formBuilder: FormBuilder
+    private formBuilder: FormBuilder,
+    private title: Title
   ) { 
     this.registrationForm = this.createForm();
   }
@@ -28,6 +30,7 @@ export class RegisterComponent implements OnInit {
     if(this.session.isLoggedIn()) {
       this.router.navigateByUrl('/dashboard');
     }
+    this.title.setTitle("Register | FeedbackHub");
   }
 
   /**

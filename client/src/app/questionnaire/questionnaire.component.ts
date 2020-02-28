@@ -3,6 +3,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { HttpService } from '../_service/http.service';
 import { FormBuilder, FormGroup, FormArray } from '@angular/forms';
 import { BootstrapAlertService } from 'ngx-bootstrap-alert-service'
+import { Title } from '@angular/platform-browser';
+import { ThrowStmt } from '@angular/compiler';
 
 @Component({
   selector: 'app-questionnaire',
@@ -27,25 +29,27 @@ export class QuestionnaireComponent implements OnInit {
     private activatedRoute: ActivatedRoute,
     private router: Router,
     private formBuilder: FormBuilder,
-    private alertService: BootstrapAlertService
-  ) { 
-    this.questionnaire = this.createQuestionnaireResponseForm();
-  }
-
-  ngOnInit() {
-    this.activatedRoute.params.subscribe(params => {
-      this.questionnaireID = params['id'];
-    });
-
-
-    this.http.post('api/fetch/questionnaire/verify', {
-      questionnaireID: this.questionnaireID
-    }).then((questionnaireData) => {
-      this.writer = questionnaireData.writtenBy;
-      this.writerID = questionnaireData.writerID;
-      this.questionnaireName = questionnaireData.questionnaireName;
-      this.importID = questionnaireData.importID;
-
+    private alertService: BootstrapAlertService,
+    private title: Title
+    ) { 
+      this.questionnaire = this.createQuestionnaireResponseForm();
+    }
+    
+    ngOnInit() {
+      this.activatedRoute.params.subscribe(params => {
+        this.questionnaireID = params['id'];
+      });
+      
+      
+      this.http.post('api/fetch/questionnaire/verify', {
+        questionnaireID: this.questionnaireID
+      }).then((questionnaireData) => {
+        this.writer = questionnaireData.writtenBy;
+        this.writerID = questionnaireData.writerID;
+        this.questionnaireName = questionnaireData.questionnaireName;
+        this.importID = questionnaireData.importID;
+        this.title.setTitle(`${this.questionnaireName} | FeedbackHub`);
+        
       //get the questions
       this.http.post('api/fetch/questionnaire/questions', {
         questionnaireID: this.questionnaireID

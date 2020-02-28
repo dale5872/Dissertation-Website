@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { HttpService } from 'src/app/_service/http.service';
 import { BootstrapAlertService } from 'ngx-bootstrap-alert-service'
 import { FormControl, FormGroup, FormBuilder, FormArray, Form } from '@angular/forms';
+import { Title } from '@angular/platform-browser';
 
 
 @Component({
@@ -18,13 +19,14 @@ export class CreateQuestionnaireComponent implements OnInit {
   constructor(    
     private http: HttpService,
     private alertService: BootstrapAlertService,
-    private formBuilder: FormBuilder
+    private formBuilder: FormBuilder,
+    private title: Title
   ) {
     this.questionnaireInfoForm = this.createQuestionnaireForm();
    }
 
   ngOnInit() {
-
+  this.title.setTitle("Create Questionnaire | FeedbackHub");
   }
 
   private createQuestionnaireForm(): FormGroup {

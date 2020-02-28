@@ -77,13 +77,16 @@ export class SessionService {
   }
 
   checkValidCookie() {
-    this.http.get("http://51.11.10.177:3000/api/validate/cookie", {
+    this.http.get("http://feedbackhub.uksouth.cloudapp.azure.com:3000/api/validate/cookie", {
       withCredentials: true
     }).subscribe(() => {
       return true;
     }, (error) => {
       if(error.status === 401) {
-        this.logout();
+        sessionStorage.clear();
+        this.cookieService.deleteAll('/', 'feedbackhub.uksouth.cloudapp.azure.com');
+        this._isAuthenticatedSubject.next(false);
+        this.router.navigateByUrl('/');
       } 
       return false;
     });
@@ -93,9 +96,9 @@ export class SessionService {
    */
   logout() {
     sessionStorage.clear();
-    this.cookieService.deleteAll('/', '51.11.10.177');
+    this.cookieService.deleteAll('/', 'feedbackhub.uksouth.cloudapp.azure.com');
 
-    this.http.delete('http://51.11.10.177:3000/api/destroy/session', {
+    this.http.delete('http://feedbackhub.uksouth.cloudapp.azure.com:3000/api/destroy/session', {
       withCredentials: true
     }).subscribe(() => {
     }, (error) => {
