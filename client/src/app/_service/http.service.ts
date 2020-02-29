@@ -1,6 +1,8 @@
 import { Injectable, getModuleFactory } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { BootstrapAlertService } from 'ngx-bootstrap-alert-service';
+import { timeout, catchError, retry } from 'rxjs/operators';
+import { of } from 'rxjs/observable/of';
 
 import { User } from '../_models/user';
 import { SessionService } from './session.service';
@@ -42,6 +44,25 @@ export class HttpService {
     });
   }
 
+  postURL(url: string, body: Object): any {
+    return new Promise((resolve, reject) => {
+      this.http.post(url, body).pipe(
+        timeout(5000),
+        retry(3),
+        catchError(e => {
+          // do something on a timeout
+          reject("Connection Timed Out");
+          return of(null);
+        })
+      ).subscribe((res: HttpReturn) => {
+        resolve(res.dataObject);
+      }, (error) => {
+        this.handleError(error);
+        reject(error.message);
+      });
+
+    });
+  }
   /**
    * Sends an HTTP GET request to the server and returns the response,
    * while also updating any session information
