@@ -54,7 +54,9 @@ export class QuestionnaireComponent implements OnInit {
       this.http.post('api/fetch/questionnaire/questions', {
         questionnaireID: this.questionnaireID
       }).then((questionnaireHeaders) => {
-        this.questionData = questionnaireHeaders.headers;
+        this.questionData = questionnaireHeaders;
+        console.log(this.questionData);
+        console.log(this.questionData[0]);
 
         this.questionData.forEach(() => {
           this.addQuestion();
@@ -106,7 +108,7 @@ export class QuestionnaireComponent implements OnInit {
       this.http.post('api/insert/questionnaire/response', {
         questionnaireData: JSON.stringify(questionnaireData)
       });
-      this.submitted = true;
+      //this.submitted = true;
     } catch(error) {
       this.alertService.showError(error.message);
     }

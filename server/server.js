@@ -182,7 +182,7 @@ app.post('/api/uploadfile', multipartMiddleware, (req, res) => {
         res.write(`File ${filepath} has been uploaded. Importing into database...`);
 
         //run the python script
-        exec(`python3 '/home/dale/ml/src/initiator.py' --f '${filepath}' --u ${userID} --o ${req.body.filename} --q ${req.body.questionnaireID} > import_logs/import_${userID}_${req.body.questionnaireID}.log`, (err, stdout, stderr) => {
+        exec(`python3 '/home/dale/ml/src/initiator.py' --f '${filepath}' --u ${userID} --o ${req.body.filename} --q ${req.body.questionnaireID} > /home/dale/www/server/import_logs/import_${userID}_${req.body.questionnaireID}.log`, (err, stdout, stderr) => {
             if(err) {
                 console.log("ERROR: Could not run Python Script for analysis.");
                 console.log(err.message);
@@ -584,7 +584,7 @@ app.route('/api/insert/questionnaire/response').post((req, res) => {
 
     responseString = responseString.substring(0, responseString.length - 1);
 
-    exec(`python3 \"/home/dale/ml/src/insertResponse.py\" --d \"${responseString}\"  --q ${JSONBody.questionnaireID} --i ${JSONBody.importID} --u ${JSONBody.writerID} 2>&1 | tee -a response_logs/questionnaire_${JSONBody.questionnaireID}.log`, (err, stdout, stderr) => {
+    exec(`python3 \"/home/dale/ml/src/insertResponse.py\" --d \"${responseString}\"  --q ${JSONBody.questionnaireID} --i ${JSONBody.importID} --u ${JSONBody.writerID} 2>&1 | tee -a /home/dale/www/server/response_logs/questionnaire_${JSONBody.questionnaireID}.log`, (err, stdout, stderr) => {
         if(err) {
             console.log("ERROR: Could not run Python Script for analysis.");
             console.log(err.message);

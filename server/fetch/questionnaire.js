@@ -259,9 +259,24 @@ class Questionnaire {
 
                                     bulkLoad.addColumn('header_name', TYPES.VarChar, {nullable: false});
                                     bulkLoad.addColumn('questionnaire_ID', TYPES.Int, {nullable: false});
+                                    bulkLoad.addColumn('image', TYPES.VarChar, {nullable: true});
 
                                     questionnaireData.questionnaireHeaders.forEach((header) => {
-                                        bulkLoad.addRow({ header_ID: null, header_name: header, questionnaire_ID: questionnaireID.value});
+                                        //check for image url
+                                        if(header.search("<img src=") !== -1) {
+                                            //lets extract the url
+                                            var start = header.indexOf("src=")+5;
+                                            var end = header.indexOf("</img>")-2;
+                                            var urlLength = end-start;
+
+                                            var url = header.substr(start, urlLength);
+                                            var new_header = header.substr(end+8);
+
+                                            console.log(new_header);
+                                            bulkLoad.addRow(new_header, questionnaireID.value, url);
+                                        } else {
+                                            bulkLoad.addRow(header,questionnaireID.value, null);
+                                        }
                                         console.log(`QUESIONNAIRE ID: ${questionnaireID.value}`);
                                     });                                    
                                     
@@ -339,7 +354,7 @@ class Questionnaire {
             }
 
             //get the questionnaire data
-            var request = new Request(`SELECT q.header_name
+            var request = new Request(`SELECT q.header_name, q.image
             FROM feedbackhub.questionnaire_headers AS q
             WHERE q.questionnaire_ID = ${questionnaireID}`, (err, rowCount, rows) => {
                 if(err) {
@@ -348,12 +363,14 @@ class Questionnaire {
                     reject("An unknown error has occured. Contact an administrator for help");
                 } else {
                     if(rowCount > 0) {
-                        var dataObject = {
-                            headers: []
-                        };
+                        var dataObject = [];
 
                         rows.forEach(column => {
-                            dataObject.headers.push(column[0]);
+                            var headerObj = {
+                                headerName: column[0].value,
+                                image: column[1].value
+                            }
+                            dataObject.push(headerObj);
                         });
 
                         //return the results

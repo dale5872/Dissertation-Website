@@ -3,7 +3,7 @@ import { HttpService } from 'src/app/_service/http.service';
 import { BootstrapAlertService } from 'ngx-bootstrap-alert-service'
 import { FormControl, FormGroup, FormBuilder, FormArray, Form } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
-
+import {NgbModal, ModalDismissReasons} from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'app-create-questionnaire',
@@ -20,7 +20,8 @@ export class CreateQuestionnaireComponent implements OnInit {
     private http: HttpService,
     private alertService: BootstrapAlertService,
     private formBuilder: FormBuilder,
-    private title: Title
+    private title: Title,
+    private modalService: NgbModal
   ) {
     this.questionnaireInfoForm = this.createQuestionnaireForm();
    }
@@ -73,5 +74,9 @@ export class CreateQuestionnaireComponent implements OnInit {
     } catch(error) {
       this.alertService.showError(error.message);
     }
+  }
+
+  openHelpModal(modal) {
+    this.modalService.open(modal, {ariaLabelledBy: 'modal-help', size: 'lg'});
   }
 }
