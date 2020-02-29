@@ -25,7 +25,7 @@ export class HttpService {
    */
   post(url: string, body: Object): any {
     return new Promise((resolve, reject) => {
-      this.http.post("http://51.11.10.177:3000/" + url, body, {
+      this.http.post("http://feedbackhub.uksouth.cloudapp.azure.com:3000/" + url, body, {
         withCredentials: true
       }).subscribe((res: HttpReturn) => {
         var userProfile: User = res.userProfile;
@@ -49,7 +49,7 @@ export class HttpService {
    */
   get(url: string): Promise<any> {
     return new Promise((resolve, reject) => {
-      this.http.get("http://51.11.10.177:3000/" + url, {
+      this.http.get("http://feedbackhub.uksouth.cloudapp.azure.com:3000/" + url, {
         withCredentials: true
       }).subscribe((res: HttpReturn) => {
         var userProfile: User = res.userProfile;
@@ -89,7 +89,7 @@ export class HttpService {
     formData.append('filename', filename);
     formData.append('questionnaireID', questionnaireID.toString());
 
-    this.http.post("http://51.11.10.177:3000/api/uploadfile", formData, {
+    this.http.post("http://feedbackhub.uksouth.cloudapp.azure.com:3000/api/uploadfile", formData, {
       withCredentials: true,
       responseType: 'text'
     }).subscribe((res: any) => {

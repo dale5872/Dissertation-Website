@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { Title } from '@angular/platform-browser';
+
 
 import { User } from '../_models/user';
 
@@ -15,10 +16,12 @@ export class DashboardComponent implements OnInit {
   cookieTestResult = "";
 
   constructor(
-    private http: HttpService
+    private http: HttpService,
+    private title: Title
    ) { }
 
   ngOnInit() {
+    this.title.setTitle("Dashboard | FeedbackHub");
   }
 
   cookieTest() {

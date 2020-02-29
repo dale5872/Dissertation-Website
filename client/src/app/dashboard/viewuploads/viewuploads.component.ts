@@ -3,6 +3,7 @@ import { HttpService } from 'src/app/_service/http.service';
 import { SessionService } from 'src/app/_service/session.service';
 import { __importDefault } from 'tslib';
 import { Router } from '@angular/router';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-viewuploads',
@@ -16,11 +17,13 @@ export class ViewuploadsComponent implements OnInit {
   constructor(
     private http: HttpService,
     private sessionService: SessionService,
-    private router: Router
+    private router: Router,
+    private title: Title
   ) { }
 
   ngOnInit() {
-    this.fetchImports()
+    this.title.setTitle("View Uploads | FeedbackHub");
+    this.fetchImports();
   }
 
   async fetchImports() {

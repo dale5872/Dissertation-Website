@@ -13,11 +13,12 @@
             <div formArrayName="questions" *ngFor="let question of questionnaireInfoForm.get('questions').controls; let i = index;">
                 <div [formGroupName]="i" class="form-group">
                     <label for="question{{i}}">Question {{i + 1}}</label>
-                    <input type="text" class="form-control" formControlName="questionName" placeholder="Question {{i + 1}}">
+                    <textarea class="form-control" formControlName="questionName" placeholder="Question {{i + 1}}"></textarea>
                 </div>
             </div>
-            <button type="button" class="btn btn-outline-primary" (click)="addQuestion()">Add Question</button>
-            <button type="button" class="btn btn-success" (click)="createQuestionnaire()">Create</button>
+            <button type="button" class="btn btn-outline-primary mr-3" (click)="addQuestion()">Add Question</button>
+            <button type="button" class="btn btn-success mr-3" (click)="createQuestionnaire()">Create</button>
+            <button type="button" class="btn btn-secondary" (click)="openHelpModal(help)">Help</button>
         </form>
     </div>
 
@@ -26,3 +27,31 @@
         <a href="{{questionnaireURL}}">{{questionnaireURL}}</a>
     </div>
 </div>
+
+<ng-template #help let-modal>
+    <div class="modal-header">
+        <h4 class="modal-title">Help</h4>
+    </div>
+    <div class="modal-body"> 
+        <div class="row px-3 pt-2">
+            <p>
+                This page allows you to create a new questionnaire for respondants to fill out. Once respondants have 
+                filled out the questionnaire, it is stored and automatically analysed. To view this analysis, click the 
+                'View Analysis'.
+            </p> <br />
+            <p>
+                There are no limit to the number of questions you can add to a questionnaire.
+            </p>
+
+            <p>
+                <b>Adding Images:</b> <br />
+                FeedbackHub supports displaying images in the questionnaire but ONLY in the following format: <br />
+                <code>&lt;img src="*Insert URL Here*"&gt;&lt;/img&gt;</code> <br />
+                This is very similar to an HTML tag, but with a closing <code>&lt;/img&gt;</code>
+            </p>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-danger" (click)="modal.close()">Close</button>
+    </div>
+</ng-template>

@@ -1,4 +1,4 @@
-import { BrowserModule } from '@angular/platform-browser';
+import { BrowserModule, Title } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { HttpClientModule } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -33,7 +33,8 @@ import { QuestionnaireComponent } from './questionnaire/questionnaire.component'
   ],
   providers: [
     AuthGuard,
-    CookieService
+    CookieService,
+    Title
   ],
   bootstrap: [AppComponent]
 })

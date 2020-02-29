@@ -16,7 +16,8 @@
                 <form [formGroup]="questionnaire" class="col-12">
                     <div formArrayName="questions" *ngFor="let question of questionnaire.get('questions').controls; let i = index;">
                         <div [formGroupName]="i" class="form-group">
-                            <h4>{{questionData[i].value}}</h4>
+                            <img *ngIf="questionData[i].image !== null" src="{{questionData[i].image}}" height="350" width="100%" style="padding-right:5%; padding-left: 5%;">
+                            <h4>{{questionData[i].headerName}}</h4>
                             <textarea class="form-control" formControlName="questionResponse" rows="3"></textarea>
                         </div>
                     </div>

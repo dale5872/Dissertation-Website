@@ -14,7 +14,7 @@ export class AuthenticationService {
   constructor(private http: HttpClient) { }
 
   login(username: string, password: string): Observable<User> {
-    return this.http.post<User>('http://51.11.10.177:3000/api/auth/login', {
+    return this.http.post<User>('http://feedbackhub.uksouth.cloudapp.azure.com:3000/api/auth/login', {
       username: username,
       password: password
     }, {
@@ -23,7 +23,7 @@ export class AuthenticationService {
   }
 
   register(profile: RegistrationModel) {
-    return this.http.post('http://51.11.10.177:3000/api/auth/login', {
+    return this.http.post('http://feedbackhub.uksouth.cloudapp.azure.com:3000/api/auth/register', {
       username: profile.username,
       password: profile.password,
       email: profile.email,

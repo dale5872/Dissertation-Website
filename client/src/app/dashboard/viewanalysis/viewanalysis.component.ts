@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpService } from 'src/app/_service/http.service';
 import { Router } from '@angular/router';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-viewanalysis',
@@ -13,10 +14,12 @@ export class ViewanalysisComponent implements OnInit {
 
   constructor(
     private http: HttpService,
-    private router: Router
+    private router: Router,
+    private title: Title
   ) { }
 
   ngOnInit() {
+    this.title.setTitle("View Analysis | FeedbackHub");
     this.fetchImports();
   }
 

@@ -53,7 +53,7 @@ app.use(express.urlencoded({
 app.use(bodyParser.urlencoded({extended : true}));
 app.use(bodyParser.json());
 
-const whitelist = ['http://localhost:4200', 'http://127.0.0.1:4200', 'http://51.11.10.177:4200', 'http://81.101.204.147', 'http://feedbackhub.uksouth.cloudapp.azure.com:4200'];
+const whitelist = ['http://localhost:4200', 'http://127.0.0.1:4200', 'http://51.11.10.177:4200', 'http://feedbackhub.uksouth.cloudapp.azure.com:4200'];
 var corsOptions = {
     origin: function (origin, callback) {
         if (whitelist.indexOf(origin) !== -1) {
@@ -94,7 +94,7 @@ app.route('/api/auth/login').post(function(req, res) {
     userProfile.loginProfile(username, password);
 
     if(global.DEBUG_FLAG) {
-        console.log(`Recieved POST Request with headers username=${username}:password=${password}`);
+        console.log(`DEBUG: Recieved POST Request with headers username=${username}:password=${password}`);
     }
 
     //using promises (i.e., syncronous execution, we authenticate the user)
@@ -133,9 +133,10 @@ app.route('/api/auth/register').post(function(req, res) {
     var profile = new UserProfile();
     profile.registerProfile(username, password, fname, lname, email);
 
-    var reg = new Registration(profile);
-    reg.register().then((message) => {
+    Registration.createAccountTransaction(profile).then((message) => {
         res.send(message);
+    }).catch((error) => {
+        res.status(500).send(error.message);
     });
 
 });
@@ -181,7 +182,7 @@ app.post('/api/uploadfile', multipartMiddleware, (req, res) => {
         res.write(`File ${filepath} has been uploaded. Importing into database...`);
 
         //run the python script
-        exec(`python3 '/home/dale/ml/src/initiator.py' --f '${filepath}' --u ${userID} --o ${req.body.filename} --q ${req.body.questionnaireID} > import_logs/import_${userID}_${req.body.questionnaireID}.log`, (err, stdout, stderr) => {
+        exec(`python3 '/home/dale/ml/src/initiator.py' --f '${filepath}' --u ${userID} --o ${req.body.filename} --q ${req.body.questionnaireID} > /home/dale/www/server/import_logs/import_${userID}_${req.body.questionnaireID}.log`, (err, stdout, stderr) => {
             if(err) {
                 console.log("ERROR: Could not run Python Script for analysis.");
                 console.log(err.message);
@@ -419,6 +420,39 @@ app.route('/api/fetch/analysis/similarities').post((req, res) => {
     }
 });
 
+app.route('/api/fetch/analysis/sentiment').post((req, res) => {
+    if(req.session.userID) {
+        if(global.DEBUG_FLAG) {
+            console.log(`DEBUG: Fetching Analysis Similaritiesx for user: ${req.session.userID}. Import: ${req.body.importID}`);
+        }
+
+        var userinfo = new UserInformation(req.session.userID);
+        var uip = userinfo.retrieve();
+
+        var similarities = Analysis.fetchSentiment(req.body.importID);
+
+        Promise.all([uip, similarities]).then(vals => {
+            if(global.DEBUG_FLAG) {
+                console.log(`DEBUG: Analysis fetched. Sending to client...`);
+            }
+            var responseObject = {
+                userProfile: vals[0],
+                dataObject: vals[1]
+            }
+            
+            res.send(responseObject);
+        }).catch((error) => {
+            res.status(500).send(error.message);
+        });
+    } else {
+        if(global.DEBUG_FLAG) {
+            console.log(`DEBUG: UserID was not present in cookie. Aborting...`);
+        }
+        res.status(401).send("User not authorized");
+    }
+});
+
+
 app.route('/api/fetch/questionnaire/all').get((req, res) => {
     if(req.session.userID) {
         if(global.DEBUG_FLAG) {
@@ -550,7 +584,7 @@ app.route('/api/insert/questionnaire/response').post((req, res) => {
 
     responseString = responseString.substring(0, responseString.length - 1);
 
-    exec(`python3 '/home/dale/ml/src/insertResponse.py' --d '${responseString}'  --q ${JSONBody.questionnaireID} --i ${JSONBody.importID} --u ${JSONBody.writerID} 2>&1 | tee -a response_logs/questionnaire_${JSONBody.questionnaireID}.log`, (err, stdout, stderr) => {
+    exec(`python3 \"/home/dale/ml/src/insertResponse.py\" --d \"${responseString}\"  --q ${JSONBody.questionnaireID} --i ${JSONBody.importID} --u ${JSONBody.writerID} 2>&1 | tee -a /home/dale/www/server/response_logs/questionnaire_${JSONBody.questionnaireID}.log`, (err, stdout, stderr) => {
         if(err) {
             console.log("ERROR: Could not run Python Script for analysis.");
             console.log(err.message);

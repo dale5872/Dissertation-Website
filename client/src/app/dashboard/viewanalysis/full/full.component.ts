@@ -4,6 +4,7 @@ import { ActivatedRoute } from '@angular/router';
 import { compileInjectable, ThrowStmt } from '@angular/compiler';
 import {NgbModal, ModalDismissReasons} from '@ng-bootstrap/ng-bootstrap';
 import { BootstrapAlertService } from 'ngx-bootstrap-alert-service';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-full',
@@ -25,12 +26,14 @@ export class FullComponent implements OnInit {
 
   importInformation: any; //Object can be seen in server/imports.js:92
   similarityData: any; //Object casn be seen in server/analysis.js:91
+  sentimentData: any; //Object can be seen in server/analysis.js:fetchSentiment()
 
   constructor(
     private http: HttpService,
     private activatedRoute: ActivatedRoute,
     private modalService: NgbModal,
-    private alertService: BootstrapAlertService
+    private alertService: BootstrapAlertService,
+    private title: Title
   ) { }
 
   ngOnInit() {
@@ -46,8 +49,9 @@ export class FullComponent implements OnInit {
     var questionnaireData = this.http.post('api/fetch/questionnaire', {questionnaireID: this.questionnaireID});
     var responseData = this.http.post('api/fetch/analysis/full', {importID : this.importID});
     var similarityData = this.http.post('api/fetch/analysis/similarities', {importID: this.importID});
+    var sentimentData = this.http.post('api/fetch/analysis/sentiment', {importID: this.importID});
     
-    var promises = [questionnaireData, responseData, similarityData];
+    var promises = [questionnaireData, responseData, similarityData, sentimentData];
     //var promises = [questionnaireData, responseData , importData];
     
     console.log("Waiting for promises");
@@ -58,12 +62,17 @@ export class FullComponent implements OnInit {
       this.questionnaireName = values[0].questionnaireName;
       this.headers = values[0].headers;
 
+      this.title.setTitle(`${this.questionnaireName} Analysis | FeedbackHub`);
+
       var responses = values[1].imports;
 
 
       if(values[2] !== undefined) {
-        console.log(values[2]);
         this.similarityData = values[2].imports;
+      }
+
+      if(values[3] !== undefined) {
+        this.sentimentData = values[3];
       }
 
       this.populateTable(responses);
