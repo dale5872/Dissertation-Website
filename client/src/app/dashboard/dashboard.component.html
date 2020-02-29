@@ -3,6 +3,7 @@
         <!-- @todo: Add CSS Styling for Sidebar (pos: fixed, overflow-y) -->
         <div class="col-md-3 bg-light mx-0" style="height: 100vh; position:sticky;">
             <div class="list-group">
+                <button type="button" class="list-group-item list-group-item-action" routerLink='/dashboard' [routerLinkActiveOptions]="{exact:true}" routerLinkActive="active">Dashboard Home</button>
                 <button type="button" class="list-group-item list-group-item-action" routerLink='createquestionnaire' routerLinkActive="active">Create New Questionnaire</button>
                 <button type="button" class="list-group-item list-group-item-action" routerLink='viewuploads' routerLinkActive="active">View Questionnaires</button>
                 <button type="button" class="list-group-item list-group-item-action" routerLink='uploadfile' routerLinkActive="active">Upload Responses</button>

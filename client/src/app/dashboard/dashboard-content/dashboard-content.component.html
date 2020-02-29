@@ -14,7 +14,9 @@
                 <span class="text-success">OK</span>
             </ng-template>
             <ng-template [ngIf]="grammarBotClientStatus === false">
-                <span class="text-danger">Down</span> Error -> {{grammarBotClientStatusData}}
+                <span class="text-danger">Down</span> Error -> {{grammarBotClientStatusData}} <br />
+                <p><span class="text-danger">NOTE:</span> Any responses will still be uploaded, however they will not be evaluated UNTIL one response is successfully
+                submitted AND analysed (i.e., when GrammarBotClient is active again)</p>
             </ng-template>
             <ng-template [ngIf]="grammarBotClientStatus === undefined">
                 <span class="text-warning">Evaluating...</span>
