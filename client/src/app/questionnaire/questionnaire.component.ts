@@ -108,7 +108,7 @@ export class QuestionnaireComponent implements OnInit {
       this.http.post('api/insert/questionnaire/response', {
         questionnaireData: JSON.stringify(questionnaireData)
       });
-      //this.submitted = true;
+      this.submitted = true;
     } catch(error) {
       this.alertService.showError(error.message);
     }

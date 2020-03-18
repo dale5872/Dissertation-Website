@@ -70,7 +70,7 @@ export class CreateQuestionnaireComponent implements OnInit {
       var questionnaireID = questionnaireIDRequest.value;
 
       //we now show the link to the user
-      this.questionnaireURL = `http://51.11.10.177:4200/questionnaire/${questionnaireID}`;
+      this.questionnaireURL = `http://feedbackhub.uksouth.cloudapp.azure.com:4200/questionnaire/${questionnaireID}`;
     } catch(error) {
       this.alertService.showError(error.message);
     }
