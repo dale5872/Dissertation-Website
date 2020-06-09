@@ -35,7 +35,7 @@ app.use(session({
     store: new tediousStore({
         config: {
             userName: 'dale',
-            password: 'EdenHazard10',
+            password: '',
             server: 'feedback-hub.database.windows.net',
             options: {
                 database: "FeedbackHub",
